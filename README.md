@@ -85,52 +85,6 @@ The platform includes:
 
 ---
 
-## User Interface Structure
-
-### Home Screen
-The landing page includes:
-- Project overview
-- Learning path roadmap
-- Progress statistics
-- Lesson selection cards
-- Call-to-action buttons
-
-### Lesson Workspace
-The learning environment contains:
-
-#### Left Sidebar
-- Course navigation
-- XP tracking
-- Lesson progression
-
-#### Main Content Area
-- Lesson content
-- Interactive exercises
-- Simulations
-- Quizzes
-
-#### Right Sidebar
-- Robot status display
-- Skill progress bars
-- Lesson tags
-- WPILib documentation links
-
----
-
-## Technologies Used
-
-### Frontend
-- HTML5
-- CSS3
-- Vanilla JavaScript
-
-### Design
-- Responsive layout
-- Custom animations
-- SVG graphics
-- Dark-theme UI
-- Educational visualization components
-
 ### External Resources
 - Google Fonts
   - Inter
@@ -139,43 +93,14 @@ The learning environment contains:
 
 ---
 
-## Educational Philosophy
-
-FRC.learn is designed around the principle that students learn best when:
-
-1. Concepts are introduced gradually.
-2. Every new idea connects to previous ideas.
-3. Visual explanations accompany code.
-4. Practice happens immediately after instruction.
-5. Examples use real FRC scenarios instead of generic programming problems.
-
-Instead of teaching Java first and robotics later, the platform teaches Java through robotics examples from day one.
-
----
-
-## Future Improvements
+## BUG Report
 
 Potential enhancements include:
 
-- Full Java execution engine
-- Additional robot simulators
-- Autonomous path planning lessons
-- Vision programming lessons
-- AdvantageScope integration
-- Progress saving and accounts
-- Team leaderboards
-- Mentor dashboards
-- Mobile optimization
-- Competition-season challenge modes
+- Fixing the Quiz system
+- FIne Tuning the interactive features
+- A more extensive Java Sandbox
 
 ---
-
-## Inspiration
-
-This project is inspired by the need for a single resource that bridges the gap between:
-- Learning Java
-- Understanding WPILib
-- Building command-based robots
-- Becoming competition-ready
 
 The objective is to make FRC programming approachable, engaging, and achievable for every new student.
