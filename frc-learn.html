@@ -1,0 +1,2888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRC.learn — From Zero to Competition Robot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:     #070B14;
+    --bg-card:     #0F1624;
+    --bg-raised:   #162033;
+    --bg-hover:    #1E2D45;
+    --border:      #243450;
+    --border-glow: #00D4FF33;
+    --blue:        #00D4FF;
+    --blue-dim:    #0099BB;
+    --blue-glow:   #00D4FF22;
+    --amber:       #FFB800;
+    --amber-dim:   #CC9200;
+    --green:       #00FF9D;
+    --green-dim:   #00CC7A;
+    --red:         #FF4466;
+    --purple:      #9D5FFF;
+    --text-1:      #E8F0FF;
+    --text-2:      #8A9BBC;
+    --text-3:      #4A5A6E;
+    --mono:        'JetBrains Mono', monospace;
+    --sans:        'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg-deep);
+    color: var(--text-1);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── SCREENS ─────────────────────────────── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* ─── HOME SCREEN ─────────────────────────── */
+  #screen-home {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, #001833 0%, var(--bg-deep) 60%);
+    padding: 0;
+    overflow-y: auto;
+  }
+
+  .home-nav {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(7,11,20,0.8);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--blue);
+    letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--text-2); }
+
+  .nav-btn {
+    background: var(--blue);
+    color: var(--bg-deep);
+    border: none;
+    padding: 0.6rem 1.4rem;
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { background: #33DDFF; transform: translateY(-1px); }
+
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5rem 2rem 3rem;
+    max-width: 900px;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--blue);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border: 1px solid var(--border-glow);
+    background: var(--blue-glow);
+    padding: 0.35rem 1rem;
+    border-radius: 100px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--text-1);
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--blue);
+    position: relative;
+  }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--text-2);
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .btn-primary {
+    background: var(--blue);
+    color: var(--bg-deep);
+    border: none;
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 0 24px var(--blue-glow);
+  }
+  .btn-primary:hover { background: #33DDFF; transform: translateY(-2px); box-shadow: 0 0 40px #00D4FF44; }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-1);
+    border: 1px solid var(--border);
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
+
+  /* ─── ROBOT SVG ─────────────────────────── */
+  .robot-showcase {
+    margin: 1rem 0 0;
+    position: relative;
+    width: 320px;
+    height: 280px;
+  }
+
+  #hero-robot { width: 100%; height: 100%; }
+
+  .robot-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 40% at 50% 70%, #00D4FF15 0%, transparent 70%);
+    pointer-events: none;
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  /* ─── PATH OVERVIEW ─────────────────────── */
+  .path-section {
+    width: 100%;
+    max-width: 860px;
+    padding: 4rem 2rem;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 0.75rem;
+  }
+
+  .section-title {
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  .section-desc {
+    color: var(--text-2);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  .path-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .path-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .path-card:hover { border-color: var(--blue); background: var(--bg-raised); transform: translateY(-2px); }
+  .path-card.locked { opacity: 0.45; cursor: not-allowed; }
+  .path-card.locked:hover { transform: none; border-color: var(--border); background: var(--bg-card); }
+
+  .path-card-level {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-3);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.1em;
+  }
+
+  .path-card-name {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .path-card-desc {
+    font-size: 0.82rem;
+    color: var(--text-2);
+    line-height: 1.4;
+  }
+
+  .path-card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .badge-new {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: var(--green);
+    color: var(--bg-deep);
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── STATS BAR ─────────────────────────── */
+  .stats-bar {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 2.5rem;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+    margin: 2rem 0;
+  }
+
+  .stat {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--blue);
+  }
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-2);
+    margin-top: 0.2rem;
+  }
+
+  /* ─── LESSON SCREEN ─────────────────────── */
+  #screen-lesson {
+    flex-direction: row;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: var(--bg-card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .sidebar-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--blue);
+    cursor: pointer;
+    margin-bottom: 0.75rem;
+  }
+
+  .xp-bar-wrap { margin-top: 0.5rem; }
+  .xp-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--text-2);
+    margin-bottom: 0.35rem;
+    font-family: var(--mono);
+  }
+  .xp-track {
+    height: 6px;
+    background: var(--bg-raised);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--amber), var(--amber-dim));
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .sidebar-nav {
+    padding: 0.75rem 0;
+    flex: 1;
+  }
+
+  .nav-phase {
+    padding: 0.5rem 1.25rem 0.25rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 0.88rem;
+    color: var(--text-2);
+    border-left: 3px solid transparent;
+    position: relative;
+  }
+  .nav-item:hover { background: var(--bg-raised); color: var(--text-1); }
+  .nav-item.active {
+    background: var(--blue-glow);
+    color: var(--blue);
+    border-left-color: var(--blue);
+  }
+  .nav-item.completed .nav-icon { color: var(--green); }
+  .nav-item.locked { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+  .nav-icon { font-size: 1rem; min-width: 1.2rem; text-align: center; }
+  .nav-xp {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--amber);
+    background: #FFB80018;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+  }
+
+  /* Main lesson area */
+  .lesson-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-deep);
+  }
+
+  .lesson-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-card);
+    flex-shrink: 0;
+  }
+
+  .lesson-breadcrumb {
+    font-size: 0.8rem;
+    color: var(--text-2);
+    font-family: var(--mono);
+  }
+  .lesson-breadcrumb strong { color: var(--text-1); }
+
+  .lesson-progress-dots {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+  .dot.done { background: var(--green); }
+  .dot.current { background: var(--blue); box-shadow: 0 0 6px var(--blue); }
+
+  .lesson-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    max-width: 820px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* ─── LESSON TYPOGRAPHY ─────────────────── */
+  .lesson-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 0.5rem;
+  }
+
+  .lesson-title {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-bottom: 0.5rem;
+  }
+
+  .lesson-subtitle {
+    color: var(--text-2);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  /* Concept cards */
+  .concept-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .concept-card.highlight {
+    border-color: var(--border-glow);
+    background: linear-gradient(135deg, var(--bg-card) 0%, #0A1A2A 100%);
+  }
+
+  .concept-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 0.75rem;
+  }
+
+  .concept-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .concept-body {
+    color: var(--text-2);
+    line-height: 1.65;
+    font-size: 0.95rem;
+  }
+
+  .analogy-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: #FFB80010;
+    border: 1px solid #FFB80030;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+  }
+  .analogy-icon { font-size: 1.5rem; margin-top: 0.1rem; }
+  .analogy-text { font-size: 0.9rem; color: var(--text-1); line-height: 1.5; }
+  .analogy-text strong { color: var(--amber); }
+
+  /* Visual diagrams */
+  .visual-diagram {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1.25rem 0;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.8;
+    color: var(--text-2);
+    text-align: center;
+    position: relative;
+  }
+  .visual-diagram .vd-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 1rem;
+  }
+  .vd-node {
+    display: inline-block;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    color: var(--text-1);
+    margin: 0.2rem;
+  }
+  .vd-node.blue { border-color: var(--blue); color: var(--blue); background: var(--blue-glow); }
+  .vd-node.amber { border-color: var(--amber); color: var(--amber); background: #FFB80010; }
+  .vd-node.green { border-color: var(--green); color: var(--green); background: #00FF9D10; }
+  .vd-arrow { color: var(--text-3); font-size: 1rem; margin: 0 0.5rem; }
+  .vd-row { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin: 0.3rem 0; }
+  .vd-col { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+  .vd-down { color: var(--text-3); font-size: 1.2rem; line-height: 1; }
+
+  /* Code blocks */
+  pre.code-block {
+    background: #050810;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin: 1rem 0;
+    position: relative;
+  }
+  pre.code-block .ln { color: var(--text-3); user-select: none; margin-right: 1rem; }
+  .kw { color: #7CB9FF; }
+  .ty { color: #4DD9AC; }
+  .str { color: #CE9178; }
+  .cm { color: #4A5A6E; font-style: italic; }
+  .num { color: #B5CEA8; }
+  .fn { color: #DCDCAA; }
+  .var { color: #9CDCFE; }
+  .op { color: #D4D4D4; }
+
+  /* Interactive sandbox */
+  .sandbox {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+  }
+
+  .sandbox-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+    background: var(--bg-raised);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sandbox-title {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-2);
+    letter-spacing: 0.05em;
+  }
+
+  .run-btn {
+    background: var(--green);
+    color: var(--bg-deep);
+    border: none;
+    padding: 0.35rem 1rem;
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .run-btn:hover { background: #33FFB2; }
+
+  .sandbox-editor {
+    min-height: 120px;
+    padding: 1rem 1.25rem;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--text-1);
+    background: #050810;
+    border: none;
+    outline: none;
+    width: 100%;
+    resize: vertical;
+    caret-color: var(--blue);
+    tab-size: 2;
+  }
+
+  .sandbox-output {
+    padding: 0.75rem 1.25rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    border-top: 1px solid var(--border);
+    background: #020408;
+    min-height: 40px;
+    color: var(--green);
+    white-space: pre-wrap;
+  }
+  .sandbox-output.error { color: var(--red); }
+
+  /* Simulator panel */
+  .sim-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .sim-title {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    align-self: flex-start;
+  }
+
+  .sim-field {
+    width: 100%;
+    max-width: 480px;
+    height: 200px;
+    background: #0A1A0A;
+    border: 2px solid #1A3A1A;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sim-field-lines {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sim-center-line {
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: #2A4A2A;
+  }
+
+  .sim-robot-sprite {
+    position: absolute;
+    width: 36px;
+    height: 40px;
+    background: var(--bg-raised);
+    border: 2px solid var(--blue);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: left 0.4s ease, top 0.4s ease, transform 0.4s ease;
+    box-shadow: 0 0 12px var(--blue-glow);
+  }
+
+  .sim-controls {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .sim-btn {
+    background: var(--bg-raised);
+    color: var(--text-1);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sim-btn:hover { background: var(--bg-hover); border-color: var(--blue); color: var(--blue); }
+  .sim-btn.active { background: var(--blue-glow); border-color: var(--blue); color: var(--blue); }
+
+  /* Quiz */
+  .quiz-block {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .quiz-question {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 0.9rem;
+  }
+  .quiz-option:hover { border-color: var(--blue); background: var(--bg-hover); }
+  .quiz-option.correct { border-color: var(--green); background: #00FF9D10; color: var(--green); }
+  .quiz-option.wrong { border-color: var(--red); background: #FF446610; color: var(--red); }
+  .quiz-option-key {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    width: 22px; height: 22px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .quiz-feedback {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: #00FF9D15; border: 1px solid #00FF9D40; color: var(--green); }
+  .quiz-feedback.wrong { background: #FF446615; border: 1px solid #FF446640; color: var(--red); }
+
+  /* Concept map */
+  .concept-map {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .concept-map-title {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 1rem;
+  }
+
+  .cm-chain {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .cm-node {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--mono);
+  }
+  .cm-node:hover { border-color: var(--blue); color: var(--blue); }
+  .cm-node.current-node { border-color: var(--blue); color: var(--blue); background: var(--blue-glow); }
+  .cm-arrow { color: var(--text-3); }
+
+  /* XP popup */
+  .xp-popup {
+    position: fixed;
+    top: 80px;
+    right: 2rem;
+    background: var(--bg-raised);
+    border: 1px solid var(--amber);
+    border-radius: 10px;
+    padding: 0.75rem 1.25rem;
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    color: var(--amber);
+    font-weight: 700;
+    z-index: 999;
+    transform: translateY(-20px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+  }
+  .xp-popup.show { transform: translateY(0); opacity: 1; }
+
+  /* lesson nav footer */
+  .lesson-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg-card);
+    flex-shrink: 0;
+  }
+
+  .lesson-footer-prev, .lesson-footer-next {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-1);
+    padding: 0.6rem 1.25rem;
+    border-radius: 7px;
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .lesson-footer-prev:hover, .lesson-footer-next:hover { border-color: var(--blue); color: var(--blue); }
+  .lesson-footer-next { background: var(--blue); color: var(--bg-deep); border-color: var(--blue); }
+  .lesson-footer-next:hover { background: #33DDFF; color: var(--bg-deep); border-color: #33DDFF; }
+
+  .lesson-step-info {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-2);
+  }
+
+  /* Right panel */
+  .right-panel {
+    width: 280px;
+    min-width: 280px;
+    background: var(--bg-card);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .rp-section {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .rp-title {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 0.75rem;
+  }
+
+  .mini-robot-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 0.5rem 0;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0;
+    font-size: 0.82rem;
+  }
+  .stat-name { color: var(--text-2); }
+  .stat-val { font-family: var(--mono); font-size: 0.8rem; color: var(--text-1); }
+
+  .skill-bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 0.6rem;
+  }
+  .skill-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+  }
+  .skill-bar-name { color: var(--text-2); }
+  .skill-bar-pct { font-family: var(--mono); font-size: 0.7rem; color: var(--blue); }
+  .skill-track { height: 4px; background: var(--bg-raised); border-radius: 99px; overflow: hidden; }
+  .skill-fill { height: 100%; background: var(--blue); border-radius: 99px; transition: width 1s ease; }
+  .skill-fill.amber { background: var(--amber); }
+  .skill-fill.green { background: var(--green); }
+  .skill-fill.purple { background: var(--purple); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+  /* Tag chips */
+  .tag { display: inline-block; font-family: var(--mono); font-size: 0.68rem; padding: 0.2rem 0.6rem; border-radius: 4px; margin: 0.15rem; background: var(--bg-raised); border: 1px solid var(--border); color: var(--text-2); }
+  .tag.blue { border-color: var(--border-glow); color: var(--blue); background: var(--blue-glow); }
+
+  /* Completion banner */
+  .complete-banner {
+    background: linear-gradient(135deg, #002A0A, #001A08);
+    border: 1px solid var(--green);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    display: none;
+  }
+  .complete-banner.show { display: block; }
+  .complete-banner h3 { color: var(--green); font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .complete-banner p { color: var(--text-2); font-size: 0.9rem; }
+
+  /* Info callout */
+  .info-callout {
+    display: flex;
+    gap: 0.75rem;
+    background: var(--blue-glow);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 0.9rem 1.1rem;
+    margin: 1rem 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text-1);
+  }
+  .info-icon { color: var(--blue); flex-shrink: 0; font-size: 1.1rem; }
+
+  @media (max-width: 900px) {
+    .right-panel { display: none; }
+    .sidebar { width: 56px; min-width: 56px; }
+    .sidebar-header, .nav-phase, .nav-item span, .nav-xp, .xp-bar-wrap, .sidebar-logo span { display: none; }
+    .sidebar-logo { text-align: center; font-size: 0.7rem; }
+    .nav-item { justify-content: center; padding: 0.8rem; }
+    .nav-icon { margin: 0; font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     HOME SCREEN
+═══════════════════════════════════════════ -->
+<div id="screen-home" class="screen active">
+  <nav class="home-nav">
+    <div class="logo">FRC<span>.learn</span></div>
+    <button class="nav-btn" onclick="gotoLesson('variables')">Start Learning →</button>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-eyebrow">⚡ September → Kickoff — Zero to Competition Robot</div>
+    <h1>Learn FRC programming<br>the way your <em>brain works</em></h1>
+    <p class="hero-sub">
+      No confusing docs. No setup required. Start from variables, build to a full command-based robot.
+      Interactive lessons, live simulators, real Java — right in your browser.
+    </p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="gotoLesson('variables')">Start from zero →</button>
+      <button class="btn-secondary" onclick="gotoLesson('commands')">I know Java, skip ahead</button>
+    </div>
+
+    <div class="robot-showcase">
+      <div class="robot-glow"></div>
+      <svg id="hero-robot" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Chassis base -->
+        <rect x="80" y="140" width="160" height="90" rx="8" fill="#0F1624" stroke="#243450" stroke-width="1.5"/>
+        <!-- Drive wheels -->
+        <rect x="60" y="155" width="28" height="50" rx="6" fill="#162033" stroke="#243450" stroke-width="1.5"/>
+        <rect x="232" y="155" width="28" height="50" rx="6" fill="#162033" stroke="#243450" stroke-width="1.5"/>
+        <!-- Wheel highlight lines -->
+        <line x1="74" y1="162" x2="74" y2="198" stroke="#00D4FF" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+        <line x1="246" y1="162" x2="246" y2="198" stroke="#00D4FF" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+        <!-- Motor glow left -->
+        <circle cx="74" cy="180" r="10" fill="#00D4FF" opacity="0.12" class="motor-glow-l"/>
+        <circle cx="74" cy="180" r="5" fill="#00D4FF" opacity="0.3" class="motor-glow-l"/>
+        <!-- Motor glow right -->
+        <circle cx="246" cy="180" r="10" fill="#00D4FF" opacity="0.12" class="motor-glow-r"/>
+        <circle cx="246" cy="180" r="5" fill="#00D4FF" opacity="0.3" class="motor-glow-r"/>
+        <!-- Robot body upper -->
+        <rect x="90" y="90" width="140" height="60" rx="6" fill="#0F1624" stroke="#243450" stroke-width="1.5"/>
+        <!-- Bumper stripe blue -->
+        <rect x="82" y="225" width="156" height="10" rx="2" fill="#003399" opacity="0.8"/>
+        <!-- Intake bar -->
+        <rect x="80" y="82" width="160" height="14" rx="4" fill="#162033" stroke="#243450" stroke-width="1.5"/>
+        <!-- roboRIO chip area -->
+        <rect x="105" y="100" width="110" height="40" rx="4" fill="#162033" stroke="#00D4FF" stroke-width="0.8" stroke-dasharray="3 2"/>
+        <text x="160" y="116" text-anchor="middle" fill="#00D4FF" font-family="JetBrains Mono, monospace" font-size="7" opacity="0.7">roboRIO</text>
+        <text x="160" y="128" text-anchor="middle" fill="#4A5A6E" font-family="JetBrains Mono, monospace" font-size="5">FIRST Robotics</text>
+        <!-- Status lights -->
+        <circle cx="116" cy="135" r="4" fill="#00FF9D" opacity="0.9" class="status-light"/>
+        <circle cx="130" cy="135" r="4" fill="#FFB800" opacity="0.9"/>
+        <circle cx="144" cy="135" r="4" fill="#FF4466" opacity="0.5"/>
+        <!-- Camera mast -->
+        <rect x="148" y="60" width="24" height="32" rx="3" fill="#0F1624" stroke="#243450" stroke-width="1.5"/>
+        <rect x="151" y="63" width="18" height="14" rx="2" fill="#162033" stroke="#00D4FF" stroke-width="0.8" opacity="0.7"/>
+        <!-- Shooter wheel -->
+        <circle cx="220" cy="105" r="18" fill="#0A1020" stroke="#243450" stroke-width="1.5"/>
+        <circle cx="220" cy="105" r="12" fill="#162033" stroke="#9D5FFF" stroke-width="0.8" opacity="0.6"/>
+        <circle cx="220" cy="105" r="5" fill="#9D5FFF" opacity="0.4"/>
+        <!-- Shooter spokes -->
+        <line x1="220" y1="93" x2="220" y2="117" stroke="#9D5FFF" stroke-width="0.8" opacity="0.5"/>
+        <line x1="208" y1="105" x2="232" y2="105" stroke="#9D5FFF" stroke-width="0.8" opacity="0.5"/>
+        <!-- Arm -->
+        <rect x="88" y="60" width="10" height="50" rx="3" fill="#162033" stroke="#243450" stroke-width="1.5"/>
+        <rect x="78" y="56" width="30" height="10" rx="3" fill="#162033" stroke="#FFB800" stroke-width="0.8" opacity="0.7"/>
+        <!-- Antenna -->
+        <line x1="160" y1="60" x2="160" y2="40" stroke="#243450" stroke-width="1.5"/>
+        <circle cx="160" cy="36" r="5" fill="#0F1624" stroke="#00D4FF" stroke-width="1.5" class="antenna-light"/>
+        <!-- Team number -->
+        <text x="160" y="178" text-anchor="middle" fill="#4A5A6E" font-family="JetBrains Mono, monospace" font-size="9" font-weight="bold">FRC</text>
+        <!-- Battery indicator -->
+        <rect x="100" y="155" width="40" height="18" rx="3" fill="#0A0E1A" stroke="#243450" stroke-width="1"/>
+        <rect x="103" y="158" width="28" height="12" rx="2" fill="#00D4FF" opacity="0.6" class="batt-fill"/>
+        <text x="120" y="168" text-anchor="middle" fill="#00D4FF" font-family="JetBrains Mono, monospace" font-size="6" class="batt-text">12V</text>
+        <!-- Ground clearance lines -->
+        <line x1="80" y1="236" x2="240" y2="236" stroke="#1A2A3A" stroke-width="1" stroke-dasharray="3 3"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-num">10</div><div class="stat-label">Levels</div></div>
+    <div class="stat"><div class="stat-num">30+</div><div class="stat-label">Interactive Lessons</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-label">Setup Required</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">FRC-focused</div></div>
+  </div>
+
+  <div class="path-section">
+    <div class="section-label">Learning Path</div>
+    <div class="section-title">Your road to kickoff</div>
+    <p class="section-desc">Every concept builds on the last. Start where you are.</p>
+    <div class="path-grid">
+      <div class="path-card" onclick="gotoLesson('variables')">
+        <div class="badge-new">Start here</div>
+        <div class="path-card-icon">📦</div>
+        <div class="path-card-level">LEVEL 1</div>
+        <div class="path-card-name">Variables</div>
+        <div class="path-card-desc">Store robot data like motor speed and sensor readings.</div>
+      </div>
+      <div class="path-card" onclick="gotoLesson('ifstatements')">
+        <div class="path-card-icon">🔀</div>
+        <div class="path-card-level">LEVEL 2</div>
+        <div class="path-card-name">If Statements</div>
+        <div class="path-card-desc">Make the robot decide — move, stop, react.</div>
+      </div>
+      <div class="path-card" onclick="gotoLesson('loops')">
+        <div class="path-card-icon">🔁</div>
+        <div class="path-card-level">LEVEL 3</div>
+        <div class="path-card-name">Loops</div>
+        <div class="path-card-desc">Repeat actions: drive distance, scan sensors.</div>
+      </div>
+      <div class="path-card" onclick="gotoLesson('methods')">
+        <div class="path-card-icon">⚙️</div>
+        <div class="path-card-level">LEVEL 4</div>
+        <div class="path-card-name">Methods</div>
+        <div class="path-card-desc">Package logic into reusable robot commands.</div>
+      </div>
+      <div class="path-card" onclick="gotoLesson('classes')">
+        <div class="path-card-icon">🏗️</div>
+        <div class="path-card-level">LEVEL 5</div>
+        <div class="path-card-name">Classes & Objects</div>
+        <div class="path-card-desc">Build robot blueprints — the core of Java.</div>
+      </div>
+      <div class="path-card" onclick="gotoLesson('subsystems')">
+        <div class="path-card-icon">🤖</div>
+        <div class="path-card-level">LEVEL 6</div>
+        <div class="path-card-name">Subsystems</div>
+        <div class="path-card-desc">Organize your robot's hardware into clean systems.</div>
+      </div>
+      <div class="path-card" onclick="gotoLesson('commands')">
+        <div class="path-card-icon">📋</div>
+        <div class="path-card-level">LEVEL 7</div>
+        <div class="path-card-name">Commands</div>
+        <div class="path-card-desc">Tell subsystems what to do, when to do it.</div>
+      </div>
+      <div class="path-card" onclick="gotoLesson('robotcontainer')">
+        <div class="path-card-icon">🎮</div>
+        <div class="path-card-level">LEVEL 8</div>
+        <div class="path-card-name">RobotContainer</div>
+        <div class="path-card-desc">Wire controllers to commands. The robot brain.</div>
+      </div>
+      <div class="path-card locked">
+        <div class="path-card-icon">🔒</div>
+        <div class="path-card-level">LEVEL 9</div>
+        <div class="path-card-name">Autonomous</div>
+        <div class="path-card-desc">Complete earlier levels to unlock.</div>
+      </div>
+      <div class="path-card locked">
+        <div class="path-card-icon">🏆</div>
+        <div class="path-card-level">LEVEL 10</div>
+        <div class="path-card-name">Competition Robot</div>
+        <div class="path-card-desc">Complete earlier levels to unlock.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     LESSON SCREEN
+═══════════════════════════════════════════ -->
+<div id="screen-lesson" class="screen">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo" onclick="showScreen('home')">FRC<span>.learn</span></div>
+      <div class="xp-bar-wrap">
+        <div class="xp-label">
+          <span id="xp-label-lv">LV 1</span>
+          <span id="xp-label-val">0 / 100 XP</span>
+        </div>
+        <div class="xp-track"><div class="xp-fill" id="xp-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-phase">Phase 1 — Java</div>
+      <div class="nav-item" id="nav-variables" onclick="gotoLesson('variables')">
+        <span class="nav-icon">📦</span>
+        <span>Variables</span>
+        <span class="nav-xp">+15 XP</span>
+      </div>
+      <div class="nav-item" id="nav-ifstatements" onclick="gotoLesson('ifstatements')">
+        <span class="nav-icon">🔀</span>
+        <span>If Statements</span>
+        <span class="nav-xp">+15 XP</span>
+      </div>
+      <div class="nav-item" id="nav-loops" onclick="gotoLesson('loops')">
+        <span class="nav-icon">🔁</span>
+        <span>Loops</span>
+        <span class="nav-xp">+15 XP</span>
+      </div>
+      <div class="nav-item" id="nav-methods" onclick="gotoLesson('methods')">
+        <span class="nav-icon">⚙️</span>
+        <span>Methods</span>
+        <span class="nav-xp">+20 XP</span>
+      </div>
+      <div class="nav-item" id="nav-classes" onclick="gotoLesson('classes')">
+        <span class="nav-icon">🏗️</span>
+        <span>Classes & Objects</span>
+        <span class="nav-xp">+20 XP</span>
+      </div>
+      <div class="nav-phase">Phase 2 — WPILib</div>
+      <div class="nav-item" id="nav-subsystems" onclick="gotoLesson('subsystems')">
+        <span class="nav-icon">🤖</span>
+        <span>Subsystems</span>
+        <span class="nav-xp">+25 XP</span>
+      </div>
+      <div class="nav-item" id="nav-commands" onclick="gotoLesson('commands')">
+        <span class="nav-icon">📋</span>
+        <span>Commands</span>
+        <span class="nav-xp">+25 XP</span>
+      </div>
+      <div class="nav-item" id="nav-robotcontainer" onclick="gotoLesson('robotcontainer')">
+        <span class="nav-icon">🎮</span>
+        <span>RobotContainer</span>
+        <span class="nav-xp">+30 XP</span>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="lesson-main">
+    <div class="lesson-topbar">
+      <div class="lesson-breadcrumb" id="lesson-breadcrumb">Phase 1 → <strong>Variables</strong></div>
+      <div class="lesson-progress-dots" id="progress-dots"></div>
+    </div>
+    <div class="lesson-content" id="lesson-content">
+      <!-- Injected by JS -->
+    </div>
+    <div class="lesson-footer">
+      <button class="lesson-footer-prev" id="btn-prev" onclick="lessonPrev()">← Prev</button>
+      <div class="lesson-step-info" id="step-info">Step 1 of 5</div>
+      <button class="lesson-footer-next" id="btn-next" onclick="lessonNext()">Next →</button>
+    </div>
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside class="right-panel">
+    <div class="rp-section">
+      <div class="rp-title">Your Robot</div>
+      <div class="mini-robot-wrap">
+        <svg width="120" height="110" viewBox="0 0 320 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="80" y="140" width="160" height="90" rx="8" fill="#0F1624" stroke="#243450" stroke-width="2"/>
+          <rect x="60" y="155" width="28" height="50" rx="6" fill="#162033" stroke="#243450" stroke-width="2"/>
+          <rect x="232" y="155" width="28" height="50" rx="6" fill="#162033" stroke="#243450" stroke-width="2"/>
+          <circle cx="74" cy="180" r="8" id="rp-motor-l" fill="#00D4FF" opacity="0.15"/>
+          <circle cx="246" cy="180" r="8" id="rp-motor-r" fill="#00D4FF" opacity="0.15"/>
+          <rect x="90" y="90" width="140" height="60" rx="6" fill="#0F1624" stroke="#243450" stroke-width="2"/>
+          <rect x="105" y="100" width="110" height="40" rx="4" fill="#162033" stroke="#00D4FF" stroke-width="0.8" stroke-dasharray="3 2"/>
+          <text x="160" y="116" text-anchor="middle" fill="#00D4FF" font-family="monospace" font-size="7" opacity="0.7">roboRIO</text>
+          <circle cx="116" cy="135" r="4" fill="#00FF9D" opacity="0.9"/>
+          <circle cx="130" cy="135" r="4" fill="#FFB800" opacity="0.9"/>
+          <rect x="80" y="82" width="160" height="14" rx="4" fill="#162033" stroke="#243450" stroke-width="2"/>
+          <circle cx="160" cy="36" r="5" fill="#0F1624" stroke="#00D4FF" stroke-width="2" opacity="0.6"/>
+          <line x1="160" y1="60" x2="160" y2="40" stroke="#243450" stroke-width="2"/>
+          <rect x="82" y="225" width="156" height="10" rx="2" fill="#003399" opacity="0.8"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="rp-section">
+      <div class="rp-title">Your Progress</div>
+      <div class="skill-bar-row">
+        <div class="skill-bar-label"><span class="skill-bar-name">Java Syntax</span><span class="skill-bar-pct" id="pct-java">0%</span></div>
+        <div class="skill-track"><div class="skill-fill" id="bar-java" style="width:0%"></div></div>
+      </div>
+      <div class="skill-bar-row">
+        <div class="skill-bar-label"><span class="skill-bar-name">OOP</span><span class="skill-bar-pct" id="pct-oop">0%</span></div>
+        <div class="skill-track"><div class="skill-fill amber" id="bar-oop" style="width:0%"></div></div>
+      </div>
+      <div class="skill-bar-row">
+        <div class="skill-bar-label"><span class="skill-bar-name">WPILib</span><span class="skill-bar-pct" id="pct-wpi">0%</span></div>
+        <div class="skill-track"><div class="skill-fill green" id="bar-wpi" style="width:0%"></div></div>
+      </div>
+      <div class="skill-bar-row">
+        <div class="skill-bar-label"><span class="skill-bar-name">Command-Based</span><span class="skill-bar-pct" id="pct-cmd">0%</span></div>
+        <div class="skill-track"><div class="skill-fill purple" id="bar-cmd" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="rp-section">
+      <div class="rp-title">Lesson Tags</div>
+      <div id="rp-tags"></div>
+    </div>
+
+    <div class="rp-section">
+      <div class="rp-title">WPILib Docs</div>
+      <div style="font-size:0.82rem; color:var(--text-2); line-height:1.5;">
+        Official reference for this lesson:
+        <a id="wpi-link" href="https://docs.wpilib.org/en/stable/index.html" target="_blank"
+          style="color:var(--blue);text-decoration:none;display:block;margin-top:0.5rem;font-family:var(--mono);font-size:0.75rem;">
+          📖 docs.wpilib.org →
+        </a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- XP popup -->
+<div class="xp-popup" id="xp-popup">+15 XP!</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+const state = {
+  xp: 0,
+  level: 1,
+  completedLessons: new Set(),
+  currentLesson: null,
+  currentStep: 0,
+};
+
+const XP_PER_LEVEL = 100;
+
+// ─────────────────────────────────────────────
+//  LESSON DEFINITIONS
+// ─────────────────────────────────────────────
+const LESSONS = {
+  variables: {
+    title: 'Variables',
+    phase: 'Phase 1 — Java Fundamentals',
+    xpReward: 15,
+    wpiLink: 'https://docs.wpilib.org/en/stable/docs/software/what-is-wpilib.html',
+    tags: ['java', 'fundamentals', 'data'],
+    skills: { java: 20, oop: 0, wpi: 0, cmd: 0 },
+    steps: [
+      {
+        type: 'concept',
+        title: 'What is a Variable?',
+        subtitle: 'Variables are named containers that hold data your robot needs to remember.',
+        content: `
+<div class="concept-card highlight">
+  <div class="concept-label">The Core Idea</div>
+  <div class="concept-title">A variable is a named box that holds a value.</div>
+  <div class="concept-body">
+    Every robot needs to remember things: <em>How fast is this motor spinning? What is the battery voltage? Is the button pressed?</em>
+    Variables are how Java remembers these things.
+  </div>
+</div>
+
+<div class="analogy-box">
+  <div class="analogy-icon">💡</div>
+  <div class="analogy-text">
+    <strong>Think of it like a label on a box.</strong> You write "motor speed" on the outside, put the value 0.5 inside.
+    Whenever you need the speed, you look at the box labeled "motor speed."
+  </div>
+</div>
+
+<div class="visual-diagram">
+  <div class="vd-title">Variable in Java</div>
+  <div class="vd-row">
+    <div class="vd-node blue">double</div>
+    <div class="vd-arrow">→</div>
+    <div class="vd-node amber">motorSpeed</div>
+    <div class="vd-arrow">=</div>
+    <div class="vd-node green">0.5</div>
+    <div class="vd-arrow">;</div>
+  </div>
+  <div style="margin-top:1rem;font-size:0.7rem;color:var(--text-3);">
+    type &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; value
+  </div>
+</div>
+
+<div class="concept-map">
+  <div class="concept-map-title">How this connects</div>
+  <div class="cm-chain">
+    <div class="cm-node current-node">Variable</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('ifstatements')">If Statement</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('methods')">Method</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('subsystems')">Subsystem</div>
+  </div>
+</div>`
+      },
+      {
+        type: 'code',
+        title: 'Java Variable Types',
+        subtitle: 'Java has several types of variables. In FRC you\'ll use these most often.',
+        content: `
+<div class="concept-card">
+  <div class="concept-label">Common FRC Variable Types</div>
+  <div class="concept-body">
+    <table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-top:0.5rem;">
+      <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:0.6rem;font-family:var(--mono);color:var(--blue)">double</td>
+        <td style="padding:0.6rem;color:var(--text-2)">Decimal numbers — motor speed (0.5), voltage (12.0)</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:0.6rem;font-family:var(--mono);color:var(--blue)">int</td>
+        <td style="padding:0.6rem;color:var(--text-2)">Whole numbers — motor port (0, 1, 2)</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:0.6rem;font-family:var(--mono);color:var(--blue)">boolean</td>
+        <td style="padding:0.6rem;color:var(--text-2)">True or false — button pressed? sensor triggered?</td>
+      </tr>
+      <tr>
+        <td style="padding:0.6rem;font-family:var(--mono);color:var(--blue)">String</td>
+        <td style="padding:0.6rem;color:var(--text-2)">Text — robot name, status messages</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<pre class="code-block"><span class="cm">// FRC variable examples</span>
+<span class="kw">double</span> <span class="var">motorSpeed</span> <span class="op">=</span> <span class="num">0.5</span><span class="op">;</span>       <span class="cm">// 50% power</span>
+<span class="kw">double</span> <span class="var">batteryVoltage</span> <span class="op">=</span> <span class="num">12.6</span><span class="op">;</span>   <span class="cm">// volts</span>
+<span class="kw">int</span>    <span class="var">leftMotorPort</span> <span class="op">=</span> <span class="num">1</span><span class="op">;</span>        <span class="cm">// CAN ID</span>
+<span class="kw">int</span>    <span class="var">rightMotorPort</span> <span class="op">=</span> <span class="num">2</span><span class="op">;</span>
+<span class="kw">boolean</span> <span class="var">isEnabled</span> <span class="op">=</span> <span class="kw">false</span><span class="op">;</span>      <span class="cm">// robot state</span>
+<span class="ty">String</span> <span class="var">teamName</span> <span class="op">=</span> <span class="str">"Team 1234"</span><span class="op">;</span></pre>
+
+<div class="info-callout">
+  <div class="info-icon">💡</div>
+  <div>In FRC Java, variable names use <strong>camelCase</strong> — start lowercase, capitalize each new word: <code style="font-family:var(--mono);color:var(--blue)">motorSpeed</code>, <code style="font-family:var(--mono);color:var(--blue)">leftMotorPort</code></div>
+</div>`
+      },
+      {
+        type: 'sandbox',
+        title: 'Try It: Write Your First Variables',
+        subtitle: 'Write variables for a robot\'s drivetrain. Try changing the values and see the output.',
+        sandboxCode: `// Define your robot's drivetrain variables
+double leftSpeed = 0.7;
+double rightSpeed = 0.7;
+int leftMotorPort = 1;
+int rightMotorPort = 2;
+boolean drivingForward = true;
+
+// Print them out
+System.out.println("Left speed: " + leftSpeed);
+System.out.println("Right speed: " + rightSpeed);
+System.out.println("Left motor port: " + leftMotorPort);
+System.out.println("Driving forward: " + drivingForward);`,
+        content: `
+<div class="info-callout">
+  <div class="info-icon">✏️</div>
+  <div>Edit the code below. Try changing the speed values. Then press <strong>Run</strong> to see the output.</div>
+</div>`
+      },
+      {
+        type: 'sim',
+        title: 'Simulator: Battery Gauge',
+        subtitle: 'Variables hold the robot\'s battery voltage. Change the voltage and watch what happens.',
+        content: `
+<p class="concept-body" style="margin-bottom:1rem;color:var(--text-2);">
+  The robot monitors its battery voltage using a variable. When voltage drops too low, the robot limits motor power to avoid brownout.
+  Drag the slider to simulate different battery levels.
+</p>
+
+<div class="sim-panel">
+  <div class="sim-title">Battery Monitor</div>
+  <div style="width:100%;max-width:460px;">
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+      <span style="font-family:var(--mono);font-size:0.8rem;color:var(--text-2);white-space:nowrap;">batteryVoltage =</span>
+      <input type="range" id="batt-slider" min="8" max="13" step="0.1" value="12.6"
+        style="flex:1;accent-color:var(--blue);" oninput="updateBattery(this.value)">
+      <span style="font-family:var(--mono);font-size:0.9rem;color:var(--blue);min-width:4rem;" id="batt-val">12.6V</span>
+    </div>
+    <div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:8px;overflow:hidden;height:28px;margin-bottom:0.75rem;position:relative;">
+      <div id="batt-bar" style="height:100%;background:var(--green);border-radius:6px;transition:all 0.3s;width:85%"></div>
+    </div>
+    <div id="batt-status" style="font-family:var(--mono);font-size:0.8rem;color:var(--green);text-align:center;">⚡ Robot fully powered — all systems nominal</div>
+    <pre class="code-block" style="margin-top:1rem;"><span class="kw">double</span> <span class="var">batteryVoltage</span> = <span class="num" id="batt-code-val">12.6</span><span class="op">;</span>
+<span class="kw">if</span> <span class="op">(</span><span class="var">batteryVoltage</span> <span class="op">&lt;</span> <span class="num">10.0</span><span class="op">) {</span>
+  <span class="cm">// brownout protection!</span>
+  limitMotorPower<span class="op">();</span>
+<span class="op">}</span></pre>
+  </div>
+</div>`
+      },
+      {
+        type: 'quiz',
+        title: 'Check Your Understanding',
+        subtitle: 'Let\'s make sure variables are solid before moving on.',
+        questions: [
+          {
+            q: 'Which variable type would you use to store a motor\'s power level (like 0.75)?',
+            options: ['int', 'double', 'boolean', 'String'],
+            correct: 1,
+            explanation: 'Correct! Motor power is a decimal between -1.0 and 1.0, so you use double. An int only holds whole numbers and would lose the decimal part.'
+          },
+          {
+            q: 'In FRC, motor ports (CAN IDs) are whole numbers like 1, 2, 3. What type should you use?',
+            options: ['double', 'String', 'int', 'boolean'],
+            correct: 2,
+            explanation: 'Correct! CAN IDs are always whole numbers, so int is the right choice. Using double would work but wastes memory and is misleading.'
+          }
+        ]
+      }
+    ]
+  },
+
+  ifstatements: {
+    title: 'If Statements',
+    phase: 'Phase 1 — Java Fundamentals',
+    xpReward: 15,
+    wpiLink: 'https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html',
+    tags: ['java', 'logic', 'decisions'],
+    skills: { java: 35, oop: 0, wpi: 5, cmd: 0 },
+    steps: [
+      {
+        type: 'concept',
+        title: 'Making Decisions',
+        subtitle: 'If statements let your robot react to the world around it.',
+        content: `
+<div class="concept-card highlight">
+  <div class="concept-label">The Core Idea</div>
+  <div class="concept-title">If this condition is true → do something. Otherwise → do something else.</div>
+  <div class="concept-body">
+    Without if statements, your robot is a statue. It can't react to a sensor, stop before hitting a wall, or change behavior based on game state.
+  </div>
+</div>
+
+<div class="analogy-box">
+  <div class="analogy-icon">🤔</div>
+  <div class="analogy-text">
+    <strong>Imagine a driver:</strong> "If I see a wall ahead, brake. Otherwise, keep driving."
+    That's exactly how an if statement works in Java — and on your robot.
+  </div>
+</div>
+
+<div class="visual-diagram">
+  <div class="vd-title">If Statement Flow</div>
+  <div class="vd-col">
+    <div class="vd-node blue">Check condition</div>
+    <div class="vd-down">↓</div>
+    <div style="display:flex;gap:2rem;align-items:flex-start;">
+      <div class="vd-col">
+        <div class="vd-node green">TRUE</div>
+        <div class="vd-down">↓</div>
+        <div class="vd-node">Drive forward</div>
+      </div>
+      <div class="vd-col">
+        <div class="vd-node" style="border-color:var(--red);color:var(--red)">FALSE</div>
+        <div class="vd-down">↓</div>
+        <div class="vd-node">Stop motors</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="concept-map">
+  <div class="concept-map-title">Concept chain</div>
+  <div class="cm-chain">
+    <div class="cm-node" onclick="gotoLesson('variables')">Variable</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node current-node">If Statement</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('loops')">Loop</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('subsystems')">Robot Logic</div>
+  </div>
+</div>`
+      },
+      {
+        type: 'code',
+        title: 'If Statements in Java',
+        subtitle: 'The syntax is straightforward. Let\'s see it in FRC context.',
+        content: `
+<pre class="code-block"><span class="cm">// Basic if statement</span>
+<span class="kw">if</span> <span class="op">(</span><span class="var">batteryVoltage</span> <span class="op">&lt;</span> <span class="num">10.0</span><span class="op">) {</span>
+    <span class="cm">// This block runs ONLY if voltage is below 10</span>
+    <span class="fn">limitMotorPower</span><span class="op">();</span>
+<span class="op">}</span>
+
+<span class="cm">// If-else: handle both cases</span>
+<span class="kw">if</span> <span class="op">(</span><span class="var">joystick</span><span class="op">.</span><span class="fn">getButton</span><span class="op">(</span><span class="num">1</span><span class="op">)) {</span>
+    <span class="var">leftMotor</span><span class="op">.</span><span class="fn">set</span><span class="op">(</span><span class="num">0.5</span><span class="op">);</span>   <span class="cm">// button held: drive</span>
+<span class="op">} else {</span>
+    <span class="var">leftMotor</span><span class="op">.</span><span class="fn">set</span><span class="op">(</span><span class="num">0.0</span><span class="op">);</span>   <span class="cm">// button released: stop</span>
+<span class="op">}</span>
+
+<span class="cm">// If-else if-else: multiple conditions</span>
+<span class="kw">if</span> <span class="op">(</span><span class="var">speed</span> <span class="op">&gt;</span> <span class="num">0.8</span><span class="op">) {</span>
+    <span class="fn">setHighGear</span><span class="op">();</span>
+<span class="op">} else if (</span><span class="var">speed</span> <span class="op">&gt;</span> <span class="num">0.4</span><span class="op">) {</span>
+    <span class="fn">setMediumGear</span><span class="op">();</span>
+<span class="op">} else {</span>
+    <span class="fn">setLowGear</span><span class="op">();</span>
+<span class="op">}</span></pre>
+
+<div class="concept-card">
+  <div class="concept-label">Comparison Operators</div>
+  <div class="concept-body">
+    <table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-top:0.25rem;">
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:0.4rem;font-family:var(--mono);color:var(--green)"> &gt; </td><td style="padding:0.4rem;color:var(--text-2)">greater than</td><td style="padding:0.4rem;font-family:var(--mono);color:var(--blue);font-size:0.78rem">speed > 0.5</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:0.4rem;font-family:var(--mono);color:var(--green)"> &lt; </td><td style="padding:0.4rem;color:var(--text-2)">less than</td><td style="padding:0.4rem;font-family:var(--mono);color:var(--blue);font-size:0.78rem">voltage &lt; 10.0</td></tr>
+      <tr style="border-bottom:1px solid var(--border)"><td style="padding:0.4rem;font-family:var(--mono);color:var(--green)"> == </td><td style="padding:0.4rem;color:var(--text-2)">equal to (use double ==)</td><td style="padding:0.4rem;font-family:var(--mono);color:var(--blue);font-size:0.78rem">port == 1</td></tr>
+      <tr><td style="padding:0.4rem;font-family:var(--mono);color:var(--green)"> != </td><td style="padding:0.4rem;color:var(--text-2)">not equal to</td><td style="padding:0.4rem;font-family:var(--mono);color:var(--blue);font-size:0.78rem">state != "idle"</td></tr>
+    </table>
+  </div>
+</div>`
+      },
+      {
+        type: 'sandbox',
+        title: 'Try It: Robot Safety Check',
+        subtitle: 'Write an if statement that protects the robot from low battery.',
+        sandboxCode: `double batteryVoltage = 9.5;   // try changing this!
+double motorPower = 0.8;
+
+if (batteryVoltage < 10.0) {
+    motorPower = 0.3;  // limit power during brownout
+    System.out.println("WARNING: Low battery! Limiting motors to " + motorPower);
+} else {
+    System.out.println("Battery OK (" + batteryVoltage + "V). Full power available.");
+}
+
+System.out.println("Final motor power: " + motorPower);`,
+        content: `
+<div class="info-callout">
+  <div class="info-icon">🔋</div>
+  <div>Try setting <code style="font-family:var(--mono);color:var(--blue)">batteryVoltage</code> to different values like <strong>12.0</strong> or <strong>8.5</strong> and see how the output changes.</div>
+</div>`
+      },
+      {
+        type: 'quiz',
+        title: 'Check Your Understanding',
+        subtitle: 'Quick check on if statements before moving forward.',
+        questions: [
+          {
+            q: 'What symbol do you use in Java to check if two values are EQUAL?',
+            options: ['=', '==', '===', 'equals'],
+            correct: 1,
+            explanation: 'Correct! In Java, = assigns a value, but == compares two values. This is a very common source of bugs in early programming!'
+          },
+          {
+            q: 'Your robot\'s limit switch returns true when pressed. Which code stops the motor when it\'s pressed?',
+            options: [
+              'if (limitSwitch = true) { motor.set(0.0); }',
+              'if (limitSwitch == true) { motor.set(0.0); }',
+              'if (limitSwitch != false) { motor.set(1.0); }',
+              'limitSwitch.stop();'
+            ],
+            correct: 1,
+            explanation: 'Correct! if (limitSwitch == true) properly compares the boolean. You could also write just if (limitSwitch) since it\'s already a boolean.'
+          }
+        ]
+      }
+    ]
+  },
+
+  loops: {
+    title: 'Loops',
+    phase: 'Phase 1 — Java Fundamentals',
+    xpReward: 15,
+    wpiLink: 'https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html',
+    tags: ['java', 'loops', 'repetition'],
+    skills: { java: 50, oop: 0, wpi: 5, cmd: 0 },
+    steps: [
+      {
+        type: 'concept',
+        title: 'Loops: Do It Again',
+        subtitle: 'Loops let your robot repeat actions without writing the same code over and over.',
+        content: `
+<div class="concept-card highlight">
+  <div class="concept-label">The Core Idea</div>
+  <div class="concept-title">A loop repeats a block of code until a condition is met.</div>
+  <div class="concept-body">
+    Imagine telling each motor port: "Check port 1… check port 2… check port 3… check port 4."
+    With a loop, you write that logic once and it runs for every port automatically.
+  </div>
+</div>
+
+<div class="analogy-box">
+  <div class="analogy-icon">🔄</div>
+  <div class="analogy-text">
+    <strong>FRC robots loop constantly.</strong> Every 20 milliseconds, the robot's main loop runs: read sensors, process controller input, update motors.
+    That core robot loop is a <code style="font-family:var(--mono);color:var(--blue)">while(true)</code> loop — it never stops until the robot powers off.
+  </div>
+</div>
+
+<div class="visual-diagram">
+  <div class="vd-title">For Loop — Drive 5 segments</div>
+  <div class="vd-col">
+    <div class="vd-node blue">i = 0</div>
+    <div class="vd-down">↓</div>
+    <div class="vd-node amber">i &lt; 5?</div>
+    <div class="vd-down">↓</div>
+    <div class="vd-node green">Drive segment</div>
+    <div class="vd-down">↓</div>
+    <div class="vd-node">i++</div>
+    <div class="vd-down">↻ back to check</div>
+  </div>
+</div>
+
+<div class="concept-map">
+  <div class="concept-map-title">Concept chain</div>
+  <div class="cm-chain">
+    <div class="cm-node" onclick="gotoLesson('variables')">Variable</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('ifstatements')">If Statement</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node current-node">Loop</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('methods')">Methods</div>
+  </div>
+</div>`
+      },
+      {
+        type: 'code',
+        title: 'Three Types of Loops',
+        subtitle: 'You\'ll use all three in FRC code. Here\'s when each one makes sense.',
+        content: `
+<pre class="code-block"><span class="cm">// FOR loop — when you know how many times</span>
+<span class="kw">for</span> <span class="op">(</span><span class="kw">int</span> <span class="var">i</span> <span class="op">=</span> <span class="num">0</span><span class="op">;</span> <span class="var">i</span> <span class="op">&lt;</span> <span class="num">5</span><span class="op">;</span> <span class="var">i</span><span class="op">++) {</span>
+    <span class="fn">driveForward</span><span class="op">(</span><span class="num">0.5</span><span class="op">);</span>     <span class="cm">// runs 5 times</span>
+<span class="op">}</span>
+
+<span class="cm">// WHILE loop — when you don't know how many times</span>
+<span class="kw">while</span> <span class="op">(</span><span class="var">ballCounter</span> <span class="op">&lt;</span> <span class="num">3</span><span class="op">) {</span>
+    <span class="fn">runIntake</span><span class="op">();</span>           <span class="cm">// keep intaking until 3 balls</span>
+    <span class="var">ballCounter</span> <span class="op">=</span> <span class="fn">countBalls</span><span class="op">();</span>
+<span class="op">}</span>
+
+<span class="cm">// FOR-EACH — loop over a collection</span>
+<span class="kw">for</span> <span class="op">(</span><span class="ty">Subsystem</span> <span class="var">sub</span> <span class="op">:</span> <span class="var">subsystems</span><span class="op">) {</span>
+    <span class="var">sub</span><span class="op">.</span><span class="fn">periodic</span><span class="op">();</span>       <span class="cm">// update each subsystem</span>
+<span class="op">}</span></pre>
+
+<div class="info-callout">
+  <div class="info-icon">🤖</div>
+  <div><strong>WPILib's CommandScheduler</strong> uses a loop internally. Every 20ms, it loops over all active commands and calls their <code style="font-family:var(--mono);color:var(--blue)">execute()</code> methods. You're about to learn exactly how that works!</div>
+</div>`
+      },
+      {
+        type: 'sandbox',
+        title: 'Try It: Autonomous Drive Pattern',
+        subtitle: 'Use a loop to make the robot drive a square pattern.',
+        sandboxCode: `// Drive a square: forward, turn 90°, repeat 4 times
+for (int side = 0; side < 4; side++) {
+    System.out.println("Side " + (side + 1) + ": Driving forward...");
+    // driveForward(1.5 seconds)
+    
+    System.out.println("Side " + (side + 1) + ": Turning 90 degrees...");
+    // turnRight(90 degrees)
+}
+
+System.out.println("Square complete! Back at start.");`,
+        content: `
+<div class="info-callout">
+  <div class="info-icon">🏁</div>
+  <div>Try changing the loop to drive a <strong>triangle</strong> (3 sides) or <strong>hexagon</strong> (6 sides) instead!</div>
+</div>`
+      },
+      {
+        type: 'quiz',
+        title: 'Check Your Understanding',
+        subtitle: 'Loops check.',
+        questions: [
+          {
+            q: 'In a for loop: for (int i = 0; i < 4; i++), how many times does the loop body execute?',
+            options: ['3', '4', '5', 'infinite'],
+            correct: 1,
+            explanation: 'Correct! The loop starts at i=0 and runs while i < 4, so i takes values 0, 1, 2, 3 — that\'s 4 iterations.'
+          }
+        ]
+      }
+    ]
+  },
+
+  methods: {
+    title: 'Methods',
+    phase: 'Phase 1 — Java Fundamentals',
+    xpReward: 20,
+    wpiLink: 'https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html',
+    tags: ['java', 'methods', 'functions', 'reusability'],
+    skills: { java: 60, oop: 15, wpi: 5, cmd: 0 },
+    steps: [
+      {
+        type: 'concept',
+        title: 'Methods: Packaged Actions',
+        subtitle: 'Methods let you name and reuse blocks of code. They\'re the verbs of your robot.',
+        content: `
+<div class="concept-card highlight">
+  <div class="concept-label">The Core Idea</div>
+  <div class="concept-title">A method is a named, reusable block of code that does one specific thing.</div>
+  <div class="concept-body">
+    Without methods, you'd write the same motor-control code everywhere. With methods, you write it once, name it
+    <code style="font-family:var(--mono);color:var(--blue)">driveForward()</code>, and call it whenever you need it.
+  </div>
+</div>
+
+<div class="analogy-box">
+  <div class="analogy-icon">📋</div>
+  <div class="analogy-text">
+    <strong>Methods are like plays in an FRC strategy notebook.</strong>
+    "Defense play" is a named procedure — everyone knows what it means and how to execute it.
+    You don't re-explain it every time, you just call its name.
+  </div>
+</div>
+
+<div class="visual-diagram">
+  <div class="vd-title">Method Call Flow</div>
+  <div class="vd-row">
+    <div class="vd-node amber">Main code</div>
+    <div class="vd-arrow">calls</div>
+    <div class="vd-node blue">driveForward(0.5)</div>
+    <div class="vd-arrow">→</div>
+    <div class="vd-node green">Motors run</div>
+  </div>
+</div>
+
+<div class="concept-map">
+  <div class="concept-map-title">Concept chain</div>
+  <div class="cm-chain">
+    <div class="cm-node" onclick="gotoLesson('loops')">Loops</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node current-node">Methods</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('classes')">Classes</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('subsystems')">Subsystems</div>
+  </div>
+</div>`
+      },
+      {
+        type: 'code',
+        title: 'Anatomy of a Method',
+        subtitle: 'Every method has the same structure. Let\'s break it down.',
+        content: `
+<pre class="code-block"><span class="cm">// Method with no input, no output</span>
+<span class="kw">void</span> <span class="fn">stopAllMotors</span><span class="op">() {</span>
+    <span class="var">leftMotor</span><span class="op">.</span><span class="fn">set</span><span class="op">(</span><span class="num">0.0</span><span class="op">);</span>
+    <span class="var">rightMotor</span><span class="op">.</span><span class="fn">set</span><span class="op">(</span><span class="num">0.0</span><span class="op">);</span>
+<span class="op">}</span>
+
+<span class="cm">// Method with INPUT (parameters)</span>
+<span class="kw">void</span> <span class="fn">driveForward</span><span class="op">(</span><span class="kw">double</span> <span class="var">speed</span><span class="op">) {</span>
+    <span class="var">leftMotor</span><span class="op">.</span><span class="fn">set</span><span class="op">(</span><span class="var">speed</span><span class="op">);</span>
+    <span class="var">rightMotor</span><span class="op">.</span><span class="fn">set</span><span class="op">(</span><span class="var">speed</span><span class="op">);</span>
+<span class="op">}</span>
+
+<span class="cm">// Method with OUTPUT (return value)</span>
+<span class="kw">boolean</span> <span class="fn">isBatteryLow</span><span class="op">() {</span>
+    <span class="kw">return</span> <span class="fn">getBatteryVoltage</span><span class="op">() &lt;</span> <span class="num">10.0</span><span class="op">;</span>
+<span class="op">}</span>
+
+<span class="cm">// Calling methods</span>
+<span class="fn">driveForward</span><span class="op">(</span><span class="num">0.7</span><span class="op">);</span>
+<span class="kw">if</span> <span class="op">(</span><span class="fn">isBatteryLow</span><span class="op">()) {</span> <span class="fn">stopAllMotors</span><span class="op">(); }</span></pre>
+
+<div class="info-callout">
+  <div class="info-icon">🔗</div>
+  <div>In WPILib, you'll call methods constantly: <code style="font-family:var(--mono);color:var(--blue)">motor.set()</code>, <code style="font-family:var(--mono);color:var(--blue)">encoder.getPosition()</code>, <code style="font-family:var(--mono);color:var(--blue)">button.whileTrue()</code> — these are all method calls on WPILib objects.</div>
+</div>`
+      },
+      {
+        type: 'sandbox',
+        title: 'Try It: Build a Move Sequence',
+        subtitle: 'Define methods and call them in a sequence — like an autonomous routine.',
+        sandboxCode: `// Method definitions (normally in a class)
+// Here we simulate what they'd do
+
+void driveForward(double speed) {
+    System.out.println("Driving forward at " + speed + " power");
+}
+
+void turnLeft() {
+    System.out.println("Turning left 90 degrees");
+}
+
+void shoot() {
+    System.out.println("Shooting game piece!");
+}
+
+// ---- Autonomous routine ----
+System.out.println("=== AUTO START ===");
+driveForward(0.6);
+driveForward(0.6);
+turnLeft();
+driveForward(0.4);
+shoot();
+System.out.println("=== AUTO COMPLETE ===");`,
+        content: `
+<div class="info-callout">
+  <div class="info-icon">🤖</div>
+  <div>Try adding a <code style="font-family:var(--mono);color:var(--blue)">turnRight()</code> method and building your own autonomous sequence!</div>
+</div>`
+      },
+      {
+        type: 'quiz',
+        title: 'Check Your Understanding',
+        subtitle: '',
+        questions: [
+          {
+            q: 'A method that returns nothing should have which return type?',
+            options: ['null', 'nothing', 'void', 'empty'],
+            correct: 2,
+            explanation: 'Correct! void means "this method does not return a value." It\'s one of the most common return types in robot code.'
+          }
+        ]
+      }
+    ]
+  },
+
+  classes: {
+    title: 'Classes & Objects',
+    phase: 'Phase 1 — Java Fundamentals',
+    xpReward: 20,
+    wpiLink: 'https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html',
+    tags: ['java', 'OOP', 'classes', 'objects', 'blueprint'],
+    skills: { java: 70, oop: 60, wpi: 10, cmd: 5 },
+    steps: [
+      {
+        type: 'concept',
+        title: 'Classes: The Robot Blueprint',
+        subtitle: 'A class is a blueprint. An object is the real thing built from that blueprint.',
+        content: `
+<div class="concept-card highlight">
+  <div class="concept-label">The Most Important Concept in Java</div>
+  <div class="concept-title">A class defines what something IS and what it can DO. An object is an actual instance of it.</div>
+  <div class="concept-body">
+    This is the hardest concept for beginners — but it unlocks <em>everything</em>. Once you understand it, WPILib's Subsystems, Commands, and the entire command-based framework will make perfect sense.
+  </div>
+</div>
+
+<div class="analogy-box">
+  <div class="analogy-icon">🏭</div>
+  <div class="analogy-text">
+    <strong>Blueprint vs. Building:</strong> Your team's robot design document is the blueprint (class).
+    Your actual competition robot and practice robot are both built from that same blueprint (objects).
+    Both have the same features, but they exist separately.
+  </div>
+</div>
+
+<div class="visual-diagram">
+  <div class="vd-title">Class → Objects</div>
+  <div class="vd-col">
+    <div class="vd-node blue">DriveSubsystem class</div>
+    <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+      <div class="vd-down" style="margin-right:2rem">↙</div>
+      <div class="vd-down">↓</div>
+      <div class="vd-down" style="margin-left:2rem">↘</div>
+    </div>
+    <div class="vd-row" style="gap:0.5rem">
+      <div class="vd-node green">compDrive</div>
+      <div class="vd-node green">practiceDrive</div>
+      <div class="vd-node green">simDrive</div>
+    </div>
+  </div>
+</div>
+
+<div class="concept-map">
+  <div class="concept-map-title">Why this matters</div>
+  <div class="cm-chain">
+    <div class="cm-node" onclick="gotoLesson('methods')">Methods</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node current-node">Classes</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('subsystems')">Subsystems</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('commands')">Commands</div>
+  </div>
+</div>`
+      },
+      {
+        type: 'code',
+        title: 'Writing a Class in Java',
+        subtitle: 'Let\'s build a Motor class — the kind of thing WPILib builds for you.',
+        content: `
+<pre class="code-block"><span class="kw">public class</span> <span class="ty">Motor</span> <span class="op">{</span>
+    <span class="cm">// FIELDS — what a Motor HAS</span>
+    <span class="kw">private int</span>    <span class="var">port</span><span class="op">;</span>
+    <span class="kw">private double</span> <span class="var">speed</span><span class="op">;</span>
+    <span class="kw">private boolean</span> <span class="var">inverted</span><span class="op">;</span>
+
+    <span class="cm">// CONSTRUCTOR — called when you create a Motor</span>
+    <span class="kw">public</span> <span class="fn">Motor</span><span class="op">(</span><span class="kw">int</span> <span class="var">port</span><span class="op">) {</span>
+        <span class="kw">this</span><span class="op">.</span><span class="var">port</span> <span class="op">=</span> <span class="var">port</span><span class="op">;</span>
+        <span class="kw">this</span><span class="op">.</span><span class="var">speed</span> <span class="op">=</span> <span class="num">0.0</span><span class="op">;</span>
+        <span class="kw">this</span><span class="op">.</span><span class="var">inverted</span> <span class="op">=</span> <span class="kw">false</span><span class="op">;</span>
+    <span class="op">}</span>
+
+    <span class="cm">// METHODS — what a Motor can DO</span>
+    <span class="kw">public void</span> <span class="fn">set</span><span class="op">(</span><span class="kw">double</span> <span class="var">speed</span><span class="op">) {</span>
+        <span class="kw">this</span><span class="op">.</span><span class="var">speed</span> <span class="op">=</span> <span class="var">inverted</span> <span class="op">? -</span><span class="var">speed</span> <span class="op">:</span> <span class="var">speed</span><span class="op">;</span>
+    <span class="op">}</span>
+
+    <span class="kw">public double</span> <span class="fn">getSpeed</span><span class="op">() {</span>
+        <span class="kw">return</span> <span class="var">speed</span><span class="op">;</span>
+    <span class="op">}</span>
+<span class="op">}</span>
+
+<span class="cm">// CREATING OBJECTS from the class</span>
+<span class="ty">Motor</span> <span class="var">leftMotor</span>  <span class="op">=</span> <span class="kw">new</span> <span class="ty">Motor</span><span class="op">(</span><span class="num">1</span><span class="op">);</span>  <span class="cm">// port 1</span>
+<span class="ty">Motor</span> <span class="var">rightMotor</span> <span class="op">=</span> <span class="kw">new</span> <span class="ty">Motor</span><span class="op">(</span><span class="num">2</span><span class="op">);</span>  <span class="cm">// port 2</span>
+
+<span class="var">leftMotor</span><span class="op">.</span><span class="fn">set</span><span class="op">(</span><span class="num">0.7</span><span class="op">);</span>
+<span class="var">rightMotor</span><span class="op">.</span><span class="fn">set</span><span class="op">(</span><span class="num">0.7</span><span class="op">);</span></pre>`
+      },
+      {
+        type: 'sandbox',
+        title: 'Try It: Create Objects',
+        subtitle: 'Instantiate motor objects and call their methods.',
+        sandboxCode: `// Simulating Motor objects
+String leftMotor = "Motor(port=1)";
+String rightMotor = "Motor(port=2)";
+
+double leftSpeed = 0.5;
+double rightSpeed = 0.5;
+
+System.out.println("Created: " + leftMotor);
+System.out.println("Created: " + rightMotor);
+
+// "Calling set() on each motor"
+System.out.println(leftMotor + ".set(" + leftSpeed + ")  -> Left wheels spin at " + leftSpeed);
+System.out.println(rightMotor + ".set(" + rightSpeed + ") -> Right wheels spin at " + rightSpeed);
+
+System.out.println("\nRobot is driving!");`,
+        content: `
+<div class="info-callout">
+  <div class="info-icon">💡</div>
+  <div>In real WPILib code, <code style="font-family:var(--mono);color:var(--blue)">WPI_TalonFX leftMotor = new WPI_TalonFX(1);</code> follows exactly this pattern — you're creating an object from the TalonFX class with port 1.</div>
+</div>`
+      },
+      {
+        type: 'quiz',
+        title: 'Check Your Understanding',
+        subtitle: '',
+        questions: [
+          {
+            q: 'In Java, what keyword creates a new object from a class?',
+            options: ['create', 'make', 'new', 'build'],
+            correct: 2,
+            explanation: 'Correct! The new keyword allocates memory and calls the constructor. You\'ll use it constantly in FRC: new WPI_TalonFX(1), new XboxController(0), new DriveSubsystem().'
+          },
+          {
+            q: 'A class is to an object as a _____ is to a real robot.',
+            options: ['motor', 'blueprint / CAD file', 'competition field', 'controller'],
+            correct: 1,
+            explanation: 'Correct! A class is the blueprint — it defines the design. An object is the real thing built from that blueprint, with actual values stored in memory.'
+          }
+        ]
+      }
+    ]
+  },
+
+  subsystems: {
+    title: 'Subsystems',
+    phase: 'Phase 2 — WPILib Command-Based',
+    xpReward: 25,
+    wpiLink: 'https://docs.wpilib.org/en/stable/docs/software/commandbased/subsystems.html',
+    tags: ['WPILib', 'subsystem', 'hardware', 'architecture'],
+    skills: { java: 72, oop: 70, wpi: 40, cmd: 20 },
+    steps: [
+      {
+        type: 'concept',
+        title: 'Subsystems: Organizing Your Robot',
+        subtitle: 'A Subsystem is a class that owns and controls one piece of hardware.',
+        content: `
+<div class="concept-card highlight">
+  <div class="concept-label">WPILib Command-Based</div>
+  <div class="concept-title">One Subsystem = One physical part of the robot. Only ONE file controls each piece of hardware.</div>
+  <div class="concept-body">
+    Imagine 5 different programmers all trying to control the same motor from different files.
+    Chaos. Subsystems prevent this by making one class the sole owner of its hardware.
+  </div>
+</div>
+
+<div class="visual-diagram">
+  <div class="vd-title">Without vs. With Subsystems</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;text-align:left;">
+    <div>
+      <div style="color:var(--red);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;">❌ Without</div>
+      <div class="vd-node" style="display:block;margin-bottom:0.3rem;">Autonomous.java → Motor 1</div>
+      <div class="vd-node" style="display:block;margin-bottom:0.3rem;">TeleopDrive.java → Motor 1</div>
+      <div class="vd-node" style="display:block">BalanceCode.java → Motor 1</div>
+      <div style="color:var(--red);font-size:0.75rem;margin-top:0.5rem;">Conflicts! Bugs!</div>
+    </div>
+    <div>
+      <div style="color:var(--green);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;">✓ With</div>
+      <div class="vd-node blue" style="display:block;margin-bottom:0.3rem;">DriveSubsystem → Motor 1 + 2</div>
+      <div class="vd-node" style="display:block;margin-bottom:0.3rem;">Everything else → asks DriveSubsystem</div>
+      <div style="color:var(--green);font-size:0.75rem;margin-top:0.5rem;">One owner. Clean. Safe.</div>
+    </div>
+  </div>
+</div>
+
+<div class="concept-map">
+  <div class="concept-map-title">Architecture chain</div>
+  <div class="cm-chain">
+    <div class="cm-node" onclick="gotoLesson('classes')">Classes</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node current-node">Subsystem</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('commands')">Command</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('robotcontainer')">RobotContainer</div>
+  </div>
+</div>`
+      },
+      {
+        type: 'code',
+        title: 'Writing a Subsystem',
+        subtitle: 'A Subsystem extends SubsystemBase from WPILib. Here\'s the real structure.',
+        content: `
+<pre class="code-block"><span class="kw">import</span> edu.wpi.first.wpilibj2.command.<span class="ty">SubsystemBase</span><span class="op">;</span>
+<span class="kw">import</span> com.ctre.phoenix.motorcontrol.can.<span class="ty">WPI_TalonFX</span><span class="op">;</span>
+
+<span class="kw">public class</span> <span class="ty">DriveSubsystem</span> <span class="kw">extends</span> <span class="ty">SubsystemBase</span> <span class="op">{</span>
+
+  <span class="cm">// Private — only this class touches these motors</span>
+  <span class="kw">private final</span> <span class="ty">WPI_TalonFX</span> <span class="var">m_leftMotor</span>  <span class="op">=</span> <span class="kw">new</span> <span class="ty">WPI_TalonFX</span><span class="op">(</span><span class="num">1</span><span class="op">);</span>
+  <span class="kw">private final</span> <span class="ty">WPI_TalonFX</span> <span class="var">m_rightMotor</span> <span class="op">=</span> <span class="kw">new</span> <span class="ty">WPI_TalonFX</span><span class="op">(</span><span class="num">2</span><span class="op">);</span>
+
+  <span class="kw">public</span> <span class="fn">DriveSubsystem</span><span class="op">() {</span>
+    <span class="var">m_rightMotor</span><span class="op">.</span><span class="fn">setInverted</span><span class="op">(</span><span class="kw">true</span><span class="op">);</span>  <span class="cm">// right side inverted</span>
+  <span class="op">}</span>
+
+  <span class="cm">// Public methods — Commands call these</span>
+  <span class="kw">public void</span> <span class="fn">arcadeDrive</span><span class="op">(</span><span class="kw">double</span> <span class="var">speed</span><span class="op">,</span> <span class="kw">double</span> <span class="var">rotation</span><span class="op">) {</span>
+    <span class="var">m_leftMotor</span><span class="op">.</span><span class="fn">set</span><span class="op">(</span><span class="var">speed</span> <span class="op">+</span> <span class="var">rotation</span><span class="op">);</span>
+    <span class="var">m_rightMotor</span><span class="op">.</span><span class="fn">set</span><span class="op">(</span><span class="var">speed</span> <span class="op">-</span> <span class="var">rotation</span><span class="op">);</span>
+  <span class="op">}</span>
+
+  <span class="kw">public void</span> <span class="fn">stop</span><span class="op">() {</span>
+    <span class="var">m_leftMotor</span><span class="op">.</span><span class="fn">set</span><span class="op">(</span><span class="num">0.0</span><span class="op">);</span>
+    <span class="var">m_rightMotor</span><span class="op">.</span><span class="fn">set</span><span class="op">(</span><span class="num">0.0</span><span class="op">);</span>
+  <span class="op">}</span>
+
+  <span class="cm">// Runs every 20ms automatically</span>
+  <span class="op">@</span><span class="ty">Override</span>
+  <span class="kw">public void</span> <span class="fn">periodic</span><span class="op">() {</span>
+    <span class="cm">// Update SmartDashboard, etc.</span>
+  <span class="op">}</span>
+<span class="op">}</span></pre>
+
+<div class="info-callout">
+  <div class="info-icon">📎</div>
+  <div>The <code style="font-family:var(--mono);color:var(--blue)">m_</code> prefix is FRC convention for instance variables (member variables). You'll see this in all WPILib example projects.</div>
+</div>`
+      },
+      {
+        type: 'quiz',
+        title: 'Check Your Understanding',
+        subtitle: '',
+        questions: [
+          {
+            q: 'Why should motor objects be declared private in a Subsystem?',
+            options: [
+              'To make the code shorter',
+              'To prevent other classes from directly controlling the motor',
+              'Java requires it',
+              'To make it faster'
+            ],
+            correct: 1,
+            explanation: 'Correct! private means only this Subsystem class can directly call motor.set(). All other code must go through the Subsystem\'s public methods. This prevents conflicts and bugs.'
+          }
+        ]
+      }
+    ]
+  },
+
+  commands: {
+    title: 'Commands',
+    phase: 'Phase 2 — WPILib Command-Based',
+    xpReward: 25,
+    wpiLink: 'https://docs.wpilib.org/en/stable/docs/software/commandbased/commands.html',
+    tags: ['WPILib', 'commands', 'command-based', 'scheduler'],
+    skills: { java: 75, oop: 75, wpi: 70, cmd: 60 },
+    steps: [
+      {
+        type: 'concept',
+        title: 'Commands: What Should Happen, When',
+        subtitle: 'Commands are actions that tell Subsystems what to do.',
+        content: `
+<div class="concept-card highlight">
+  <div class="concept-label">WPILib Command-Based Architecture</div>
+  <div class="concept-title">A Command represents one specific robot action. The Scheduler runs them.</div>
+  <div class="concept-body">
+    Think of Commands as actions: "drive toward goal," "spin up shooter," "extend arm."
+    Each Command knows which Subsystem it needs and how to use it.
+    The <strong>CommandScheduler</strong> manages which commands run at any given time.
+  </div>
+</div>
+
+<div class="visual-diagram">
+  <div class="vd-title">Command-Based Flow</div>
+  <div class="vd-col">
+    <div class="vd-node blue">Controller button pressed</div>
+    <div class="vd-down">↓</div>
+    <div class="vd-node amber">RobotContainer binds button → Command</div>
+    <div class="vd-down">↓</div>
+    <div class="vd-node">CommandScheduler runs Command</div>
+    <div class="vd-down">↓</div>
+    <div class="vd-node green">Command calls Subsystem methods</div>
+    <div class="vd-down">↓</div>
+    <div class="vd-node">Subsystem moves hardware</div>
+  </div>
+</div>
+
+<div class="analogy-box">
+  <div class="analogy-icon">📋</div>
+  <div class="analogy-text">
+    <strong>Commands are like job assignments.</strong> The Subsystem is a worker who owns the tools.
+    Commands are assignments ("go weld this part"). The Scheduler is the foreman handing out assignments
+    and making sure no two workers fight over the same tool.
+  </div>
+</div>`
+      },
+      {
+        type: 'code',
+        title: 'Writing a Command',
+        subtitle: 'Commands have four lifecycle methods. Each runs at a different time.',
+        content: `
+<pre class="code-block"><span class="kw">import</span> edu.wpi.first.wpilibj2.command.<span class="ty">Command</span><span class="op">;</span>
+
+<span class="kw">public class</span> <span class="ty">DriveForwardCommand</span> <span class="kw">extends</span> <span class="ty">Command</span> <span class="op">{</span>
+
+  <span class="kw">private final</span> <span class="ty">DriveSubsystem</span> <span class="var">m_drive</span><span class="op">;</span>
+  <span class="kw">private final</span> <span class="kw">double</span>          <span class="var">m_speed</span><span class="op">;</span>
+
+  <span class="kw">public</span> <span class="fn">DriveForwardCommand</span><span class="op">(</span><span class="ty">DriveSubsystem</span> <span class="var">drive</span><span class="op">,</span> <span class="kw">double</span> <span class="var">speed</span><span class="op">) {</span>
+    <span class="var">m_drive</span> <span class="op">=</span> <span class="var">drive</span><span class="op">;</span>
+    <span class="var">m_speed</span> <span class="op">=</span> <span class="var">speed</span><span class="op">;</span>
+    <span class="fn">addRequirements</span><span class="op">(</span><span class="var">m_drive</span><span class="op">);</span>  <span class="cm">// "I need the drive subsystem"</span>
+  <span class="op">}</span>
+
+  <span class="op">@</span><span class="ty">Override</span>
+  <span class="kw">public void</span> <span class="fn">initialize</span><span class="op">() {</span>
+    <span class="cm">// Runs ONCE when command starts</span>
+    <span class="ty">System</span><span class="op">.</span><span class="var">out</span><span class="op">.</span><span class="fn">println</span><span class="op">(</span><span class="str">"DriveForward started"</span><span class="op">);</span>
+  <span class="op">}</span>
+
+  <span class="op">@</span><span class="ty">Override</span>
+  <span class="kw">public void</span> <span class="fn">execute</span><span class="op">() {</span>
+    <span class="cm">// Runs EVERY 20ms while active</span>
+    <span class="var">m_drive</span><span class="op">.</span><span class="fn">arcadeDrive</span><span class="op">(</span><span class="var">m_speed</span><span class="op">,</span> <span class="num">0.0</span><span class="op">);</span>
+  <span class="op">}</span>
+
+  <span class="op">@</span><span class="ty">Override</span>
+  <span class="kw">public boolean</span> <span class="fn">isFinished</span><span class="op">() {</span>
+    <span class="kw">return false</span><span class="op">;</span>  <span class="cm">// keep running until interrupted</span>
+  <span class="op">}</span>
+
+  <span class="op">@</span><span class="ty">Override</span>
+  <span class="kw">public void</span> <span class="fn">end</span><span class="op">(</span><span class="kw">boolean</span> <span class="var">interrupted</span><span class="op">) {</span>
+    <span class="var">m_drive</span><span class="op">.</span><span class="fn">stop</span><span class="op">();</span>  <span class="cm">// always stop motors when done</span>
+  <span class="op">}</span>
+<span class="op">}</span></pre>
+
+<div class="concept-card">
+  <div class="concept-label">Command Lifecycle</div>
+  <div style="display:flex;gap:0;flex-direction:column;margin-top:0.5rem;">
+    <div style="display:flex;gap:1rem;padding:0.5rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;">
+      <span style="font-family:var(--mono);color:var(--blue);min-width:120px;">initialize()</span>
+      <span style="color:var(--text-2)">Called once when the command is scheduled</span>
+    </div>
+    <div style="display:flex;gap:1rem;padding:0.5rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;">
+      <span style="font-family:var(--mono);color:var(--blue);min-width:120px;">execute()</span>
+      <span style="color:var(--text-2)">Called every 20ms while the command runs</span>
+    </div>
+    <div style="display:flex;gap:1rem;padding:0.5rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;">
+      <span style="font-family:var(--mono);color:var(--blue);min-width:120px;">isFinished()</span>
+      <span style="color:var(--text-2)">Returns true when the command should stop</span>
+    </div>
+    <div style="display:flex;gap:1rem;padding:0.5rem 0;font-size:0.82rem;">
+      <span style="font-family:var(--mono);color:var(--blue);min-width:120px;">end()</span>
+      <span style="color:var(--text-2)">Called once when command ends (cleanup)</span>
+    </div>
+  </div>
+</div>`
+      },
+      {
+        type: 'quiz',
+        title: 'Check Your Understanding',
+        subtitle: '',
+        questions: [
+          {
+            q: 'Which Command method runs every 20 milliseconds while the command is active?',
+            options: ['initialize()', 'execute()', 'isFinished()', 'end()'],
+            correct: 1,
+            explanation: 'Correct! execute() is the command\'s main loop body. It\'s where you put the ongoing work — reading controller input, calling subsystem methods, etc.'
+          },
+          {
+            q: 'Why do you call addRequirements(m_drive) in the command constructor?',
+            options: [
+              'To make the drive subsystem work',
+              'To tell the Scheduler this command needs exclusive access to DriveSubsystem',
+              'To import the DriveSubsystem class',
+              'It\'s optional, just good practice'
+            ],
+            correct: 1,
+            explanation: 'Correct! Requirements tell the CommandScheduler which Subsystem this Command "owns" while running. The Scheduler uses this to prevent two commands from fighting over the same hardware.'
+          }
+        ]
+      }
+    ]
+  },
+
+  robotcontainer: {
+    title: 'RobotContainer',
+    phase: 'Phase 2 — WPILib Command-Based',
+    xpReward: 30,
+    wpiLink: 'https://docs.wpilib.org/en/stable/docs/software/commandbased/structuring-command-based-project.html',
+    tags: ['WPILib', 'RobotContainer', 'bindings', 'architecture'],
+    skills: { java: 80, oop: 80, wpi: 90, cmd: 85 },
+    steps: [
+      {
+        type: 'concept',
+        title: 'RobotContainer: The Wiring Diagram',
+        subtitle: 'RobotContainer creates your subsystems, declares your controllers, and binds buttons to commands.',
+        content: `
+<div class="concept-card highlight">
+  <div class="concept-label">The Final Piece</div>
+  <div class="concept-title">RobotContainer is where everything connects. Controllers → Commands → Subsystems.</div>
+  <div class="concept-body">
+    Every FRC robot project has one. It's the single file that wires together all the pieces
+    you've been building: controllers, subsystems, and commands.
+  </div>
+</div>
+
+<div class="visual-diagram">
+  <div class="vd-title">Full Command-Based Architecture</div>
+  <div class="vd-col">
+    <div class="vd-row">
+      <div class="vd-node amber">XboxController</div>
+      <div class="vd-arrow">→</div>
+      <div class="vd-node blue">RobotContainer</div>
+      <div class="vd-arrow">→</div>
+      <div class="vd-node">Command</div>
+    </div>
+    <div class="vd-down">↓</div>
+    <div class="vd-row">
+      <div class="vd-node">CommandScheduler</div>
+      <div class="vd-arrow">runs</div>
+      <div class="vd-node">Command.execute()</div>
+    </div>
+    <div class="vd-down">↓</div>
+    <div class="vd-row">
+      <div class="vd-node green">Subsystem methods</div>
+      <div class="vd-arrow">→</div>
+      <div class="vd-node green">Hardware moves</div>
+    </div>
+  </div>
+</div>
+
+<div class="analogy-box">
+  <div class="analogy-icon">🎛️</div>
+  <div class="analogy-text">
+    <strong>RobotContainer is the robot's control panel wiring diagram.</strong>
+    It says: "When this button is pressed → run this command → which uses this subsystem."
+    Without it, commands and subsystems exist but nothing connects them.
+  </div>
+</div>`
+      },
+      {
+        type: 'code',
+        title: 'Writing RobotContainer',
+        subtitle: 'Here\'s a real, complete RobotContainer for a basic drivetrain.',
+        content: `
+<pre class="code-block"><span class="kw">import</span> edu.wpi.first.wpilibj2.command.button.<span class="ty">CommandXboxController</span><span class="op">;</span>
+<span class="kw">import</span> edu.wpi.first.wpilibj2.command.<span class="ty">RunCommand</span><span class="op">;</span>
+
+<span class="kw">public class</span> <span class="ty">RobotContainer</span> <span class="op">{</span>
+
+  <span class="cm">// ── Subsystems ──────────────────────────</span>
+  <span class="kw">private final</span> <span class="ty">DriveSubsystem</span> <span class="var">m_drive</span>   <span class="op">=</span> <span class="kw">new</span> <span class="ty">DriveSubsystem</span><span class="op">();</span>
+  <span class="kw">private final</span> <span class="ty">ShooterSubsystem</span> <span class="var">m_shooter</span> <span class="op">=</span> <span class="kw">new</span> <span class="ty">ShooterSubsystem</span><span class="op">();</span>
+
+  <span class="cm">// ── Controllers ─────────────────────────</span>
+  <span class="kw">private final</span> <span class="ty">CommandXboxController</span> <span class="var">m_driver</span>
+      <span class="op">=</span> <span class="kw">new</span> <span class="ty">CommandXboxController</span><span class="op">(</span><span class="num">0</span><span class="op">);</span>
+
+  <span class="kw">public</span> <span class="fn">RobotContainer</span><span class="op">() {</span>
+    <span class="fn">configureBindings</span><span class="op">();</span>
+    <span class="fn">configureDefaultCommands</span><span class="op">();</span>
+  <span class="op">}</span>
+
+  <span class="kw">private void</span> <span class="fn">configureBindings</span><span class="op">() {</span>
+    <span class="cm">// A button → shoot while held</span>
+    <span class="var">m_driver</span><span class="op">.</span><span class="fn">a</span><span class="op">()</span>
+        <span class="op">.</span><span class="fn">whileTrue</span><span class="op">(</span><span class="kw">new</span> <span class="ty">ShootCommand</span><span class="op">(</span><span class="var">m_shooter</span><span class="op">));</span>
+
+    <span class="cm">// B button → toggle intake</span>
+    <span class="var">m_driver</span><span class="op">.</span><span class="fn">b</span><span class="op">()</span>
+        <span class="op">.</span><span class="fn">toggleOnTrue</span><span class="op">(</span><span class="kw">new</span> <span class="ty">IntakeCommand</span><span class="op">(</span><span class="var">m_intake</span><span class="op">));</span>
+  <span class="op">}</span>
+
+  <span class="kw">private void</span> <span class="fn">configureDefaultCommands</span><span class="op">() {</span>
+    <span class="cm">// Joystick drives by default</span>
+    <span class="var">m_drive</span><span class="op">.</span><span class="fn">setDefaultCommand</span><span class="op">(</span>
+      <span class="kw">new</span> <span class="ty">RunCommand</span><span class="op">(() -></span>
+        <span class="var">m_drive</span><span class="op">.</span><span class="fn">arcadeDrive</span><span class="op">(</span>
+          <span class="op">-</span><span class="var">m_driver</span><span class="op">.</span><span class="fn">getLeftY</span><span class="op">(),</span>
+          <span class="var">m_driver</span><span class="op">.</span><span class="fn">getRightX</span><span class="op">()),</span>
+        <span class="var">m_drive</span><span class="op">)</span>
+    <span class="op">);</span>
+  <span class="op">}</span>
+
+  <span class="cm">// Called by Robot.java to get the auto command</span>
+  <span class="kw">public</span> <span class="ty">Command</span> <span class="fn">getAutonomousCommand</span><span class="op">() {</span>
+    <span class="kw">return</span> <span class="kw">new</span> <span class="ty">DriveForwardCommand</span><span class="op">(</span><span class="var">m_drive</span><span class="op">,</span> <span class="num">0.5</span><span class="op">);</span>
+  <span class="op">}</span>
+<span class="op">}</span></pre>`
+      },
+      {
+        type: 'sim',
+        title: 'Simulator: Drive the Robot',
+        subtitle: 'You\'ve learned the full architecture. Now drive the simulated robot.',
+        content: `
+<p style="color:var(--text-2);font-size:0.9rem;margin-bottom:1rem;line-height:1.5;">
+  This is the full pipeline in action: Controller → RobotContainer → DriveCommand → DriveSubsystem → Motors.
+  Use the buttons below to control the robot on the field.
+</p>
+
+<div class="sim-panel">
+  <div class="sim-title">FRC Field Simulator</div>
+  <div class="sim-field" id="main-sim-field">
+    <div class="sim-center-line"></div>
+    <div class="sim-robot-sprite" id="main-sim-robot" style="left:50%;top:50%;transform:translate(-50%,-50%)">🤖</div>
+  </div>
+  <div class="sim-controls">
+    <button class="sim-btn" id="sbtn-fwd" onmousedown="simDrive('fwd',true)" onmouseup="simDrive('fwd',false)" ontouchstart="simDrive('fwd',true)" ontouchend="simDrive('fwd',false)">▲ Drive Forward</button>
+    <button class="sim-btn" id="sbtn-back" onmousedown="simDrive('back',true)" onmouseup="simDrive('back',false)" ontouchstart="simDrive('back',true)" ontouchend="simDrive('back',false)">▼ Drive Back</button>
+    <button class="sim-btn" id="sbtn-left" onmousedown="simDrive('left',true)" onmouseup="simDrive('left',false)" ontouchstart="simDrive('left',true)" ontouchend="simDrive('left',false)">◄ Turn Left</button>
+    <button class="sim-btn" id="sbtn-right" onmousedown="simDrive('right',true)" onmouseup="simDrive('right',false)" ontouchstart="simDrive('right',true)" ontouchend="simDrive('right',false)">► Turn Right</button>
+  </div>
+  <div style="font-family:var(--mono);font-size:0.72rem;color:var(--text-3);text-align:center;">
+    Command: <span id="sim-cmd-label" style="color:var(--blue)">Idle</span>
+  </div>
+</div>`
+      },
+      {
+        type: 'quiz',
+        title: 'Final Check: Full Architecture',
+        subtitle: 'You now know the complete command-based framework. Let\'s confirm it.',
+        questions: [
+          {
+            q: 'In what file do you bind a joystick button to a Command?',
+            options: ['Robot.java', 'Main.java', 'RobotContainer.java', 'The Command file itself'],
+            correct: 2,
+            explanation: 'Correct! RobotContainer.java is where you create subsystems, declare controllers, and bind buttons to commands. It\'s the wiring diagram of your entire robot.'
+          },
+          {
+            q: 'Put them in order: which runs first when a button is pressed? Command, Subsystem hardware, RobotContainer binding, CommandScheduler',
+            options: [
+              'Subsystem → Command → Scheduler → RobotContainer',
+              'RobotContainer binding → CommandScheduler → Command.execute() → Subsystem hardware',
+              'Command → RobotContainer → Subsystem → Scheduler',
+              'Scheduler → RobotContainer → Subsystem → Command'
+            ],
+            correct: 1,
+            explanation: 'Correct! The flow is: Button pressed → RobotContainer binding triggers → CommandScheduler schedules the Command → Command.execute() runs every 20ms → calls Subsystem methods → hardware moves.'
+          }
+        ]
+      }
+    ]
+  }
+};
+
+// ─────────────────────────────────────────────
+//  LESSON ORDER
+// ─────────────────────────────────────────────
+const LESSON_ORDER = ['variables','ifstatements','loops','methods','classes','subsystems','commands','robotcontainer'];
+
+// ─────────────────────────────────────────────
+//  SCREEN MANAGEMENT
+// ─────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+// ─────────────────────────────────────────────
+//  XP SYSTEM
+// ─────────────────────────────────────────────
+function addXP(amount) {
+  state.xp += amount;
+  const level = Math.floor(state.xp / XP_PER_LEVEL) + 1;
+  state.level = level;
+
+  const pct = (state.xp % XP_PER_LEVEL) / XP_PER_LEVEL * 100;
+  document.getElementById('xp-bar').style.width = pct + '%';
+  document.getElementById('xp-label-lv').textContent = 'LV ' + level;
+  document.getElementById('xp-label-val').textContent = (state.xp % XP_PER_LEVEL) + ' / ' + XP_PER_LEVEL + ' XP';
+
+  const popup = document.getElementById('xp-popup');
+  popup.textContent = '+' + amount + ' XP!';
+  popup.classList.add('show');
+  setTimeout(() => popup.classList.remove('show'), 2200);
+}
+
+function updateSkillBars(skills) {
+  if (!skills) return;
+  ['java','oop','wpi','cmd'].forEach(k => {
+    const bar = document.getElementById('bar-' + k);
+    const pct = document.getElementById('pct-' + k);
+    if (bar && pct) {
+      bar.style.width = skills[k] + '%';
+      pct.textContent = skills[k] + '%';
+    }
+  });
+}
+
+// ─────────────────────────────────────────────
+//  LESSON NAVIGATION
+// ─────────────────────────────────────────────
+function gotoLesson(lessonKey) {
+  state.currentLesson = lessonKey;
+  state.currentStep = 0;
+  showScreen('lesson');
+  renderLesson();
+  updateSidebarActive(lessonKey);
+  // Update skills for this lesson
+  const lesson = LESSONS[lessonKey];
+  if (lesson) updateSkillBars(lesson.skills);
+}
+
+function lessonNext() {
+  const lesson = LESSONS[state.currentLesson];
+  if (!lesson) return;
+
+  if (state.currentStep < lesson.steps.length - 1) {
+    state.currentStep++;
+    renderLesson();
+  } else {
+    // Complete lesson
+    if (!state.completedLessons.has(state.currentLesson)) {
+      state.completedLessons.add(state.currentLesson);
+      addXP(lesson.xpReward);
+      markNavCompleted(state.currentLesson);
+    }
+    // Go to next lesson
+    const idx = LESSON_ORDER.indexOf(state.currentLesson);
+    if (idx < LESSON_ORDER.length - 1) {
+      gotoLesson(LESSON_ORDER[idx + 1]);
+    } else {
+      // All done!
+      showScreen('home');
+    }
+  }
+}
+
+function lessonPrev() {
+  if (state.currentStep > 0) {
+    state.currentStep--;
+    renderLesson();
+  } else {
+    const idx = LESSON_ORDER.indexOf(state.currentLesson);
+    if (idx > 0) {
+      gotoLesson(LESSON_ORDER[idx - 1]);
+    } else {
+      showScreen('home');
+    }
+  }
+}
+
+function updateSidebarActive(key) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('nav-' + key);
+  if (el) el.classList.add('active');
+}
+
+function markNavCompleted(key) {
+  const el = document.getElementById('nav-' + key);
+  if (el) {
+    el.classList.add('completed');
+    const icon = el.querySelector('.nav-icon');
+    if (icon) icon.textContent = '✅';
+  }
+}
+
+// ─────────────────────────────────────────────
+//  RENDER LESSON
+// ─────────────────────────────────────────────
+function renderLesson() {
+  const lesson = LESSONS[state.currentLesson];
+  if (!lesson) return;
+
+  const step = lesson.steps[state.currentStep];
+  const total = lesson.steps.length;
+
+  // Breadcrumb
+  document.getElementById('lesson-breadcrumb').innerHTML =
+    lesson.phase + ' → <strong>' + lesson.title + '</strong>';
+
+  // Progress dots
+  const dotsEl = document.getElementById('progress-dots');
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i < state.currentStep ? ' done' : i === state.currentStep ? ' current' : '');
+    dotsEl.appendChild(dot);
+  }
+
+  // Step info
+  document.getElementById('step-info').textContent =
+    'Step ' + (state.currentStep + 1) + ' of ' + total;
+
+  // Prev/Next buttons
+  document.getElementById('btn-prev').style.opacity = (state.currentStep === 0 && LESSON_ORDER.indexOf(state.currentLesson) === 0) ? '0.3' : '1';
+  const isLast = state.currentStep === total - 1;
+  const btnNext = document.getElementById('btn-next');
+  btnNext.textContent = isLast ? 'Complete Lesson →' : 'Next →';
+
+  // WPILib link
+  document.getElementById('wpi-link').href = lesson.wpiLink;
+
+  // Tags
+  const tagsEl = document.getElementById('rp-tags');
+  tagsEl.innerHTML = lesson.tags.map(t => `<span class="tag blue">${t}</span>`).join('');
+
+  // Content
+  renderStep(step);
+}
+
+function renderStep(step) {
+  const content = document.getElementById('lesson-content');
+
+  let html = `<div class="lesson-eyebrow">${LESSONS[state.currentLesson].phase}</div>
+    <h1 class="lesson-title">${step.title}</h1>
+    <p class="lesson-subtitle">${step.subtitle}</p>`;
+
+  if (step.type === 'concept' || step.type === 'code') {
+    html += step.content;
+  }
+
+  if (step.type === 'sandbox') {
+    html += step.content;
+    html += `
+    <div class="sandbox">
+      <div class="sandbox-header">
+        <div class="sandbox-title">📄 Robot.java — Live Editor</div>
+        <button class="run-btn" onclick="runSandbox()">▶ Run</button>
+      </div>
+      <textarea class="sandbox-editor" id="sandbox-code" spellcheck="false">${step.sandboxCode}</textarea>
+      <div class="sandbox-output" id="sandbox-output">// Output will appear here after you click Run</div>
+    </div>`;
+  }
+
+  if (step.type === 'sim') {
+    html += step.content;
+  }
+
+  if (step.type === 'quiz') {
+    html += renderQuiz(step);
+  }
+
+  content.innerHTML = html;
+  content.scrollTop = 0;
+
+  // Init sim
+  if (step.type === 'sim') {
+    initSimulator();
+  }
+}
+
+// ─────────────────────────────────────────────
+//  SANDBOX
+// ─────────────────────────────────────────────
+function runSandbox() {
+  const code = document.getElementById('sandbox-code').value;
+  const output = document.getElementById('sandbox-output');
+
+  const prints = [];
+  // Fake System.out.println
+  const executed = code.replace(/System\.out\.println\((.*?)\);/g, (_, arg) => {
+    return `__prints.push(String(${arg.replace(/\+/g, '+').replace(/"/g, '"').replace(/"/g, '"')}));`;
+  });
+
+  try {
+    const fn = new Function('__prints', executed.replace(/void\s+\w+\s*\([^)]*\)\s*\{[\s\S]*?\}/g, '').replace(/\/\/.*/g, ''));
+    fn(prints);
+    output.className = 'sandbox-output';
+    output.textContent = prints.length ? prints.join('\n') : '// No output. Try adding System.out.println(...)';
+  } catch (e) {
+    // Simpler direct parse for common patterns
+    const simPrints = simulatePrint(code);
+    if (simPrints.length > 0) {
+      output.className = 'sandbox-output';
+      output.textContent = simPrints.join('\n');
+    } else {
+      output.className = 'sandbox-output error';
+      output.textContent = '// ' + e.message + '\n// (Java syntax differs from JS — this is a simulation!)';
+    }
+  }
+}
+
+function simulatePrint(code) {
+  const prints = [];
+  // Extract variable declarations
+  const vars = {};
+  const varRegex = /(double|int|boolean|String)\s+(\w+)\s*=\s*([^;]+);/g;
+  let m;
+  while ((m = varRegex.exec(code)) !== null) {
+    const type = m[1], name = m[2], val = m[3].trim().replace(/"/g, '');
+    if (type === 'double' || type === 'int') vars[name] = parseFloat(val);
+    else if (type === 'boolean') vars[name] = val === 'true';
+    else vars[name] = val;
+  }
+
+  // Extract println calls
+  const printRegex = /System\.out\.println\(([^)]+)\)/g;
+  while ((m = printRegex.exec(code)) !== null) {
+    let arg = m[1].trim();
+    // Simple string concat simulation
+    let result = arg.replace(/"([^"]*)"/g, '$1')
+      .replace(/\+ (\w+)/g, (_, v) => vars[v] !== undefined ? ' ' + vars[v] : ' ' + v)
+      .replace(/(\w+) \+/g, (_, v) => vars[v] !== undefined ? vars[v] + '' : v)
+      .replace(/\+/g, '')
+      .trim();
+    prints.push(result);
+  }
+  return prints;
+}
+
+// ─────────────────────────────────────────────
+//  QUIZ
+// ─────────────────────────────────────────────
+function renderQuiz(step) {
+  let html = '';
+  step.questions.forEach((q, qi) => {
+    html += `<div class="quiz-block" id="quiz-${qi}">
+      <div class="quiz-question">Q${qi + 1}: ${q.q}</div>
+      <div class="quiz-options">`;
+    q.options.forEach((opt, oi) => {
+      const key = String.fromCharCode(65 + oi);
+      html += `<div class="quiz-option" id="qopt-${qi}-${oi}" onclick="answerQuiz(${qi},${oi},${q.correct},'${(q.explanation||'').replace(/'/g,'&#39;')}')">
+        <div class="quiz-option-key">${key}</div>
+        <span>${opt}</span>
+      </div>`;
+    });
+    html += `</div>
+      <div class="quiz-feedback" id="qfb-${qi}"></div>
+    </div>`;
+  });
+  return html;
+}
+
+function answerQuiz(qi, selected, correct, explanation) {
+  // Disable all options for this question
+  document.querySelectorAll(`#quiz-${qi} .quiz-option`).forEach((el, i) => {
+    el.style.pointerEvents = 'none';
+    if (i === correct) el.classList.add('correct');
+    else if (i === selected && i !== correct) el.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('qfb-' + qi);
+  fb.classList.add('show');
+  if (selected === correct) {
+    fb.className = 'quiz-feedback show correct';
+    fb.textContent = '✓ ' + explanation;
+  } else {
+    fb.className = 'quiz-feedback show wrong';
+    fb.textContent = '✗ Not quite. ' + explanation;
+  }
+}
+
+// ─────────────────────────────────────────────
+//  BATTERY SIMULATOR
+// ─────────────────────────────────────────────
+function updateBattery(v) {
+  const voltage = parseFloat(v);
+  document.getElementById('batt-val').textContent = voltage.toFixed(1) + 'V';
+  document.getElementById('batt-code-val').textContent = voltage.toFixed(1);
+
+  const pct = ((voltage - 8) / 5) * 100;
+  const bar = document.getElementById('batt-bar');
+  const status = document.getElementById('batt-status');
+
+  bar.style.width = pct + '%';
+
+  if (voltage >= 12.0) {
+    bar.style.background = 'var(--green)';
+    status.style.color = 'var(--green)';
+    status.textContent = '⚡ Robot fully powered — all systems nominal';
+  } else if (voltage >= 10.5) {
+    bar.style.background = 'var(--amber)';
+    status.style.color = 'var(--amber)';
+    status.textContent = '⚠ Battery draining — performance may decrease';
+  } else {
+    bar.style.background = 'var(--red)';
+    status.style.color = 'var(--red)';
+    status.textContent = '🚨 BROWNOUT RISK — motor power limited by code!';
+  }
+}
+
+// ─────────────────────────────────────────────
+//  ROBOT SIMULATOR
+// ─────────────────────────────────────────────
+let simState = { x: 50, y: 50, angle: 0, driving: {} };
+let simInterval = null;
+
+function initSimulator() {
+  simState = { x: 50, y: 50, angle: 0, driving: {} };
+  updateRobotPos();
+}
+
+function simDrive(dir, isDown) {
+  if (isDown) {
+    simState.driving[dir] = true;
+    if (!simInterval) {
+      simInterval = setInterval(simTick, 50);
+    }
+    document.getElementById('sim-cmd-label').textContent = 'Running: DriveCommand (' + dir + ')';
+    const btn = document.getElementById('sbtn-' + dir);
+    if (btn) btn.classList.add('active');
+  } else {
+    delete simState.driving[dir];
+    const btn = document.getElementById('sbtn-' + dir);
+    if (btn) btn.classList.remove('active');
+    if (Object.keys(simState.driving).length === 0) {
+      clearInterval(simInterval);
+      simInterval = null;
+      document.getElementById('sim-cmd-label').textContent = 'Idle';
+    }
+  }
+}
+
+function simTick() {
+  const speed = 1.5;
+  const turnSpeed = 3;
+  if (simState.driving['fwd']) {
+    simState.x += speed * Math.cos(simState.angle * Math.PI / 180);
+    simState.y -= speed * Math.sin(simState.angle * Math.PI / 180);
+  }
+  if (simState.driving['back']) {
+    simState.x -= speed * Math.cos(simState.angle * Math.PI / 180);
+    simState.y += speed * Math.sin(simState.angle * Math.PI / 180);
+  }
+  if (simState.driving['left']) simState.angle += turnSpeed;
+  if (simState.driving['right']) simState.angle -= turnSpeed;
+
+  simState.x = Math.max(5, Math.min(95, simState.x));
+  simState.y = Math.max(5, Math.min(90, simState.y));
+  updateRobotPos();
+}
+
+function updateRobotPos() {
+  const robot = document.getElementById('main-sim-robot');
+  if (robot) {
+    robot.style.left = simState.x + '%';
+    robot.style.top = simState.y + '%';
+    robot.style.transform = `translate(-50%, -50%) rotate(${-simState.angle}deg)`;
+  }
+}
+
+// cleanup interval when leaving
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && simInterval) {
+    clearInterval(simInterval);
+    simInterval = null;
+  }
+});
+
+// ─────────────────────────────────────────────
+//  ANIMATE HERO ROBOT
+// ─────────────────────────────────────────────
+(function animateHero() {
+  const lights = document.querySelectorAll('.status-light');
+  let on = true;
+  setInterval(() => {
+    on = !on;
+    lights.forEach(l => l.setAttribute('opacity', on ? '0.9' : '0.3'));
+  }, 1200);
+
+  const antennaLight = document.querySelector('.antenna-light');
+  if (antennaLight) {
+    let bright = true;
+    setInterval(() => {
+      bright = !bright;
+      antennaLight.setAttribute('opacity', bright ? '1' : '0.3');
+    }, 800);
+  }
+})();
+</script>
+</body>
+</html>
