@@ -40,7 +40,7 @@
     overflow-x: hidden;
   }
 
-  /* ─── SCREENS ─────────────────────────────── */
+  /* ─── SCREENS ─────────────────────────── */
   .screen { display: none; min-height: 100vh; }
   .screen.active { display: flex; }
 
@@ -133,6 +133,12 @@
     line-height: 1.6;
   }
 
+  .hero-desc {
+    color: var(--text-2);
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
   .hero-cta {
     display: flex;
     gap: 1rem;
@@ -170,7 +176,7 @@
   }
   .btn-secondary:hover { border-color: var(--blue); color: var(--blue); }
 
-  /* ─── ROBOT SVG ─────────────────────────── */
+  /* ─── ROBOT SVG ─────────────────── */
   .robot-showcase {
     margin: 1rem 0 0;
     position: relative;
@@ -1156,17 +1162,17 @@
         <div class="path-card-name">RobotContainer</div>
         <div class="path-card-desc">Wire controllers to commands. The robot brain.</div>
       </div>
-      <div class="path-card locked">
-        <div class="path-card-icon">🔒</div>
+      <div class="path-card" onclick="gotoLesson('autonomous')">
+        <div class="path-card-icon">🏁</div>
         <div class="path-card-level">LEVEL 9</div>
         <div class="path-card-name">Autonomous</div>
-        <div class="path-card-desc">Complete earlier levels to unlock.</div>
+        <div class="path-card-desc">Chain commands into 15-second routines that score without a driver.</div>
       </div>
-      <div class="path-card locked">
+      <div class="path-card" onclick="gotoLesson('competition')">
         <div class="path-card-icon">🏆</div>
         <div class="path-card-level">LEVEL 10</div>
         <div class="path-card-name">Competition Robot</div>
-        <div class="path-card-desc">Complete earlier levels to unlock.</div>
+        <div class="path-card-desc">Full robot architecture, SmartDashboard, debugging, and competition-day readiness.</div>
       </div>
     </div>
   </div>
@@ -1231,6 +1237,17 @@
         <span class="nav-icon">🎮</span>
         <span>RobotContainer</span>
         <span class="nav-xp">+30 XP</span>
+      </div>
+      <div class="nav-item" id="nav-autonomous" onclick="gotoLesson('autonomous')">
+        <span class="nav-icon">🏁</span>
+        <span>Autonomous</span>
+        <span class="nav-xp">+30 XP</span>
+      </div>
+      <div class="nav-phase">Phase 3 — Competition</div>
+      <div class="nav-item" id="nav-competition" onclick="gotoLesson('competition')">
+        <span class="nav-icon">🏆</span>
+        <span>Competition Robot</span>
+        <span class="nav-xp">+40 XP</span>
       </div>
     </nav>
   </aside>
@@ -2292,7 +2309,7 @@ System.out.println("\nRobot is driving!");`,
             explanation: 'Correct! execute() is the command\'s main loop body. It\'s where you put the ongoing work — reading controller input, calling subsystem methods, etc.'
           },
           {
-            q: 'Why do you call addRequirements(m_drive) in the command constructor?',
+            q: 'Why do you call addReuirements(m_drive) in the command constructor?',
             options: [
               'To make the drive subsystem work',
               'To tell the Scheduler this command needs exclusive access to DriveSubsystem',
@@ -2469,9 +2486,369 @@ System.out.println("\nRobot is driving!");`,
 };
 
 // ─────────────────────────────────────────────
+//  EXTRA LESSONS — Autonomous & Competition
+// ─────────────────────────────────────────────
+LESSONS['autonomous'] = {
+  title: 'Autonomous',
+  phase: 'Phase 2 — WPILib Command-Based',
+  xpReward: 30,
+  wpiLink: 'https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html',
+  tags: ['WPILib', 'autonomous', 'SequentialCommandGroup', 'PathPlanner'],
+  skills: { java: 84, oop: 82, wpi: 90, cmd: 88 },
+  steps: [
+    {
+      type: 'concept',
+      title: 'Autonomous: 15 Seconds, No Driver',
+      subtitle: 'The first 15 seconds of every FRC match are fully autonomous — your code runs alone.',
+      content: `
+<div class="concept-card highlight">
+  <div class="concept-label">FRC Match Structure</div>
+  <div class="concept-title">15 seconds autonomous, then 2 minutes 15 seconds of driver control.</div>
+  <div class="concept-body">
+    Autonomous points are often worth more per second than teleop points.
+    A robot that reliably scores in autonomous gives your team a huge competitive edge —
+    and it is built entirely from the Commands and Subsystems you already know.
+  </div>
+</div>
+
+<div class="analogy-box">
+  <div class="analogy-icon">🏁</div>
+  <div class="analogy-text">
+    <strong>Autonomous is just a Command that never reads controller input.</strong>
+    Instead of joystick values, you chain timed or sensor-triggered Commands together
+    that score points without a driver.
+  </div>
+</div>
+
+<div class="visual-diagram">
+  <div class="vd-title">Sequential vs Parallel Command Groups</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;text-align:left;">
+    <div>
+      <div style="color:var(--blue);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;">Sequential — one after another</div>
+      <div class="vd-col">
+        <div class="vd-node" style="font-size:0.75rem;">1. DriveForward(2m)</div>
+        <div class="vd-down">↓ finishes first</div>
+        <div class="vd-node" style="font-size:0.75rem;">2. TurnRight(90 deg)</div>
+        <div class="vd-down">↓ finishes first</div>
+        <div class="vd-node" style="font-size:0.75rem;">3. Shoot()</div>
+      </div>
+    </div>
+    <div>
+      <div style="color:var(--purple);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;">Parallel — at the same time</div>
+      <div class="vd-col">
+        <div class="vd-row" style="gap:0.3rem;">
+          <div class="vd-node" style="font-size:0.75rem;">SpinShooter</div>
+          <div class="vd-node" style="font-size:0.75rem;">DriveToGoal</div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-3);margin-top:0.3rem;">Both run simultaneously!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="concept-map">
+  <div class="concept-map-title">Where this fits</div>
+  <div class="cm-chain">
+    <div class="cm-node" onclick="gotoLesson('commands')">Commands</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('robotcontainer')">RobotContainer</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node current-node">Autonomous</div>
+    <div class="cm-arrow">→</div>
+    <div class="cm-node" onclick="gotoLesson('competition')">Competition Robot</div>
+  </div>
+</div>`
+    },
+    {
+      type: 'code',
+      title: 'Building an Autonomous Routine',
+      subtitle: 'Use SequentialCommandGroup and ParallelCommandGroup to compose complex autos.',
+      content: `
+<pre class="code-block"><span class="kw">import</span> edu.wpi.first.wpilibj2.command.<span class="ty">SequentialCommandGroup</span><span class="op">;</span>
+<span class="kw">import</span> edu.wpi.first.wpilibj2.command.<span class="ty">ParallelCommandGroup</span><span class="op">;</span>
+<span class="kw">import</span> edu.wpi.first.wpilibj2.command.<span class="ty">WaitCommand</span><span class="op">;</span>
+
+<span class="cm">// Simple taxi auto — leaves the starting zone</span>
+<span class="kw">public class</span> <span class="ty">TaxiAuto</span> <span class="kw">extends</span> <span class="ty">SequentialCommandGroup</span> <span class="op">{</span>
+  <span class="kw">public</span> <span class="fn">TaxiAuto</span><span class="op">(</span><span class="ty">DriveSubsystem</span> <span class="var">drive</span><span class="op">) {</span>
+    <span class="fn">addCommands</span><span class="op">(</span>
+      <span class="kw">new</span> <span class="ty">DriveForwardCommand</span><span class="op">(</span><span class="var">drive</span><span class="op">,</span> <span class="num">0.5</span><span class="op">),</span>
+      <span class="kw">new</span> <span class="ty">WaitCommand</span><span class="op">(</span><span class="num">2.0</span><span class="op">),</span>
+      <span class="kw">new</span> <span class="ty">StopDriveCommand</span><span class="op">(</span><span class="var">drive</span><span class="op">)</span>
+    <span class="op">);</span>
+  <span class="op">}</span>
+<span class="op">}</span>
+
+<span class="cm">// Shoot-and-drive — parallel spin-up + drive</span>
+<span class="kw">public class</span> <span class="ty">ShootAndDriveAuto</span> <span class="kw">extends</span> <span class="ty">SequentialCommandGroup</span> <span class="op">{</span>
+  <span class="kw">public</span> <span class="fn">ShootAndDriveAuto</span><span class="op">(</span><span class="ty">DriveSubsystem</span> <span class="var">drive</span><span class="op">,</span>
+                            <span class="ty">ShooterSubsystem</span> <span class="var">shooter</span><span class="op">) {</span>
+    <span class="fn">addCommands</span><span class="op">(</span>
+      <span class="kw">new</span> <span class="ty">ParallelCommandGroup</span><span class="op">(</span>
+        <span class="kw">new</span> <span class="ty">SpinUpShooterCommand</span><span class="op">(</span><span class="var">shooter</span><span class="op">),</span>
+        <span class="kw">new</span> <span class="ty">DriveToGoalCommand</span><span class="op">(</span><span class="var">drive</span><span class="op">)</span>
+      <span class="op">),</span>
+      <span class="kw">new</span> <span class="ty">ShootCommand</span><span class="op">(</span><span class="var">shooter</span><span class="op">),</span>
+      <span class="kw">new</span> <span class="ty">DriveForwardCommand</span><span class="op">(</span><span class="var">drive</span><span class="op">, -</span><span class="num">0.5</span><span class="op">)</span>
+    <span class="op">);</span>
+  <span class="op">}</span>
+<span class="op">}</span>
+
+<span class="cm">// In RobotContainer:</span>
+<span class="kw">public</span> <span class="ty">Command</span> <span class="fn">getAutonomousCommand</span><span class="op">() {</span>
+  <span class="kw">return</span> <span class="kw">new</span> <span class="ty">ShootAndDriveAuto</span><span class="op">(</span><span class="var">m_drive</span><span class="op">,</span> <span class="var">m_shooter</span><span class="op">);</span>
+<span class="op">}</span></pre>
+
+<div class="info-callout">
+  <div class="info-icon">📎</div>
+  <div>Advanced teams use <strong>PathPlanner</strong> or <strong>Choreo</strong> to follow smooth curved trajectories — but they still use this same Command infrastructure underneath.</div>
+</div>`
+    },
+    {
+      type: 'sandbox',
+      title: 'Try It: Simulate an Autonomous Timeline',
+      subtitle: 'Trace through a sequential routine and see how long each step takes.',
+      sandboxCode: `// Simulating a 15-second autonomous routine
+int elapsed = 0;
+
+System.out.println("=== AUTONOMOUS START (t=0ms) ===");
+
+// Command 1: Spin up shooter (2 seconds)
+System.out.println("[" + elapsed + "ms] SpinUpShooter: initialize()");
+elapsed = elapsed + 2000;
+System.out.println("[" + elapsed + "ms] SpinUpShooter: finished");
+
+// Command 2: Shoot (500ms)
+System.out.println("[" + elapsed + "ms] ShootCommand: initialize()");
+elapsed = elapsed + 500;
+System.out.println("[" + elapsed + "ms] ShootCommand: finished");
+
+// Command 3: Drive forward (3 seconds)
+System.out.println("[" + elapsed + "ms] DriveForward: initialize()");
+elapsed = elapsed + 3000;
+System.out.println("[" + elapsed + "ms] DriveForward: finished");
+
+System.out.println("=== AUTO COMPLETE at " + elapsed + "ms ===");
+System.out.println("Time remaining: " + (15000 - elapsed) + "ms");`,
+      content: `
+<div class="info-callout">
+  <div class="info-icon">⏱️</div>
+  <div>Try adding more commands. Stay under <strong>15000ms</strong> (15 seconds). Real teams fine-tune auto timing for hours to maximise points scored.</div>
+</div>`
+    },
+    {
+      type: 'quiz',
+      title: 'Check Your Understanding',
+      subtitle: '',
+      questions: [
+        {
+          q: 'How long is the autonomous period in a standard FRC match?',
+          options: ['10 seconds', '15 seconds', '30 seconds', '45 seconds'],
+          correct: 1,
+          explanation: 'Autonomous is 15 seconds. No driver input is allowed — the robot scores entirely on its own programmed logic.'
+        },
+        {
+          q: 'You want to spin up the shooter AND drive to the goal at the same time. Which group do you use?',
+          options: ['SequentialCommandGroup', 'ParallelCommandGroup', 'WaitCommand', 'RunCommand'],
+          correct: 1,
+          explanation: 'ParallelCommandGroup runs all its child commands simultaneously. SequentialCommandGroup runs them one after another — use that for steps that must finish in order.'
+        }
+      ]
+    }
+  ]
+};
+
+LESSONS['competition'] = {
+  title: 'Competition Robot',
+  phase: 'Phase 3 — Competition Ready',
+  xpReward: 40,
+  wpiLink: 'https://docs.wpilib.org/en/stable/docs/software/telemetry/smartdashboard/index.html',
+  tags: ['competition', 'SmartDashboard', 'debugging', 'full-robot'],
+  skills: { java: 95, oop: 95, wpi: 98, cmd: 98 },
+  steps: [
+    {
+      type: 'concept',
+      title: 'Competition Robot: Putting It All Together',
+      subtitle: 'A competition-ready robot combines every concept you have learned into one reliable system.',
+      content: `
+<div class="concept-card highlight">
+  <div class="concept-label">You Made It</div>
+  <div class="concept-title">A competition robot is Variables + If Statements + Loops + Methods + Classes + Subsystems + Commands + RobotContainer + Autonomous, working together.</div>
+  <div class="concept-body">
+    Every concept you learned is actively used. Nothing was wasted.
+  </div>
+</div>
+
+<div class="visual-diagram">
+  <div class="vd-title">Full Competition Robot Architecture</div>
+  <div class="vd-col">
+    <div class="vd-row">
+      <div class="vd-node amber">XboxController</div>
+      <div class="vd-arrow">→</div>
+      <div class="vd-node blue">RobotContainer</div>
+    </div>
+    <div class="vd-down">↓ binds buttons to commands</div>
+    <div class="vd-row">
+      <div class="vd-node">DriveCommand</div>
+      <div class="vd-node">ShootCommand</div>
+      <div class="vd-node">IntakeCommand</div>
+    </div>
+    <div class="vd-down">↓ call methods on</div>
+    <div class="vd-row">
+      <div class="vd-node green">DriveSubsystem</div>
+      <div class="vd-node green">ShooterSubsystem</div>
+      <div class="vd-node green">IntakeSubsystem</div>
+    </div>
+    <div class="vd-down">↓ control</div>
+    <div class="vd-row">
+      <div class="vd-node">Motors</div>
+      <div class="vd-node">Sensors</div>
+      <div class="vd-node">Pneumatics</div>
+    </div>
+  </div>
+</div>
+
+<div class="analogy-box">
+  <div class="analogy-icon">🏆</div>
+  <div class="analogy-text">
+    <strong>Competition programming is 30% writing code and 70% testing and debugging.</strong>
+    Robots that win are not the ones with the cleverest code — they are the ones that work
+    consistently, match after match.
+  </div>
+</div>`
+    },
+    {
+      type: 'code',
+      title: 'SmartDashboard: Your Eyes on the Robot',
+      subtitle: 'SmartDashboard streams live robot data to your driver station for debugging and tuning.',
+      content: `
+<pre class="code-block"><span class="kw">import</span> edu.wpi.first.wpilibj.smartdashboard.<span class="ty">SmartDashboard</span><span class="op">;</span>
+
+<span class="cm">// In DriveSubsystem.periodic() — runs every 20ms</span>
+<span class="op">@</span><span class="ty">Override</span>
+<span class="kw">public void</span> <span class="fn">periodic</span><span class="op">() {</span>
+  <span class="ty">SmartDashboard</span><span class="op">.</span><span class="fn">putNumber</span><span class="op">(</span><span class="str">"Left Motor"</span><span class="op">,</span>   <span class="var">m_left</span><span class="op">.</span><span class="fn">get</span><span class="op">());</span>
+  <span class="ty">SmartDashboard</span><span class="op">.</span><span class="fn">putNumber</span><span class="op">(</span><span class="str">"Right Motor"</span><span class="op">,</span>  <span class="var">m_right</span><span class="op">.</span><span class="fn">get</span><span class="op">());</span>
+  <span class="ty">SmartDashboard</span><span class="op">.</span><span class="fn">putNumber</span><span class="op">(</span><span class="str">"Encoder Pos"</span><span class="op">,</span>  <span class="var">m_encoder</span><span class="op">.</span><span class="fn">getPosition</span><span class="op">());</span>
+  <span class="ty">SmartDashboard</span><span class="op">.</span><span class="fn">putBoolean</span><span class="op">(</span><span class="str">"Limit Switch"</span><span class="op">,</span> <span class="var">m_limit</span><span class="op">.</span><span class="fn">get</span><span class="op">());</span>
+<span class="op">}</span>
+
+<span class="cm">// Common competition bugs:</span>
+<span class="cm">// BUG 1 — Wrong CAN ID</span>
+<span class="cm">// Symptom: motor output shows 0.7 but nothing moves</span>
+<span class="cm">// Fix: match CAN ID in code to Phoenix Tuner</span>
+
+<span class="cm">// BUG 2 — Inverted motor</span>
+<span class="cm">// Symptom: robot spins when joystick pushed forward</span>
+<span class="cm">// Fix: m_right.setInverted(true);</span>
+
+<span class="cm">// BUG 3 — Missing addRequirements()</span>
+<span class="cm">// Symptom: two commands fight over same motor</span>
+<span class="cm">// Fix: addRequirements(m_drive) in every command constructor</span>
+
+<span class="cm">// BUG 4 — NullPointerException on enable</span>
+<span class="cm">// Symptom: robot crashes immediately</span>
+<span class="cm">// Fix: check that every object is created with new before use</span></pre>
+
+<div class="info-callout">
+  <div class="info-icon">💡</div>
+  <div><strong>AdvantageScope</strong> is the modern upgrade to SmartDashboard — it logs everything to a file so you can replay a match exactly, seeing what the robot saw. Top teams use it at every event.</div>
+</div>`
+    },
+    {
+      type: 'sandbox',
+      title: 'Final Challenge: Full Robot Simulation',
+      subtitle: 'Put everything together — a complete robot init, autonomous routine, and teleop handoff.',
+      sandboxCode: `// Full competition robot simulation
+int LEFT_MOTOR_PORT = 1;
+int RIGHT_MOTOR_PORT = 2;
+int SHOOTER_MOTOR_PORT = 3;
+double maxAutoSpeed = 0.6;
+boolean autonomousActive = true;
+double batteryVoltage = 12.4;
+
+System.out.println("=== ROBOT INIT ===");
+System.out.println("Left motor CAN: " + LEFT_MOTOR_PORT);
+System.out.println("Right motor CAN: " + RIGHT_MOTOR_PORT);
+System.out.println("Battery: " + batteryVoltage + "V");
+
+// Autonomous (Loops + If Statements)
+System.out.println("\\n=== AUTONOMOUS START ===");
+int autoStepsDone = 0;
+
+for (int step = 1; step <= 3; step++) {
+    if (batteryVoltage < 10.0) {
+        System.out.println("WARNING: Low battery! Limiting speed.");
+        maxAutoSpeed = 0.3;
+    }
+    if (step == 1) {
+        System.out.println("Step " + step + ": Spinning up shooter...");
+    }
+    if (step == 2) {
+        System.out.println("Step " + step + ": Shooting game piece!");
+    }
+    if (step == 3) {
+        System.out.println("Step " + step + ": Driving at " + maxAutoSpeed);
+    }
+    autoStepsDone = step;
+}
+
+System.out.println("Auto complete. Steps done: " + autoStepsDone);
+System.out.println("\\n=== TELEOP START ===");
+System.out.println("Driver has control. Go score some points!");`,
+      content: `
+<div class="info-callout">
+  <div class="info-icon">🏆</div>
+  <div>This simulation uses <strong>every concept from all 10 levels</strong>: variables, if statements, loops, methods, and the architecture that runs real FRC robots. You are ready for kickoff.</div>
+</div>`
+    },
+    {
+      type: 'quiz',
+      title: 'Final Exam: Competition Readiness',
+      subtitle: '',
+      questions: [
+        {
+          q: 'Your robot spins in circles when the joystick is pushed straight forward. What is most likely wrong?',
+          options: [
+            'The CAN IDs are both set to 0',
+            'One motor is not inverted — it runs backward relative to the other side',
+            'The command scheduler is not running',
+            'The joystick port number is wrong'
+          ],
+          correct: 1,
+          explanation: 'If both motors get the same signal but one is physically mirrored, one drives forward while the other drives backward — causing spinning. Fix: call setInverted(true) on the mirrored side motor.'
+        },
+        {
+          q: 'What does getAutonomousCommand() in RobotContainer return?',
+          options: [
+            'A Subsystem',
+            'A Command or CommandGroup',
+            'A Controller object',
+            'A boolean'
+          ],
+          correct: 1,
+          explanation: 'getAutonomousCommand() returns a Command — typically a SequentialCommandGroup. The CommandScheduler runs it automatically when the match enters autonomous mode.'
+        },
+        {
+          q: 'What is the best first debugging step when your robot does something unexpected at a competition?',
+          options: [
+            'Rewrite the entire robot code from scratch',
+            'Observe exactly what it does, form a hypothesis, then check SmartDashboard values',
+            'Replace all the motors',
+            'Give up and ask someone else'
+          ],
+          correct: 1,
+          explanation: 'Debugging is detective work: observe precisely what is wrong, form a hypothesis about the cause, then use SmartDashboard to confirm or deny it. Systematic debugging fixes problems in minutes instead of hours.'
+        }
+      ]
+    }
+  ]
+};
+
+// ─────────────────────────────────────────────
 //  LESSON ORDER
 // ─────────────────────────────────────────────
-const LESSON_ORDER = ['variables','ifstatements','loops','methods','classes','subsystems','commands','robotcontainer'];
+const LESSON_ORDER = ['variables','ifstatements','loops','methods','classes','subsystems','commands','robotcontainer','autonomous','competition'];
 
 // ─────────────────────────────────────────────
 //  SCREEN MANAGEMENT
@@ -2723,11 +3100,23 @@ function simulatePrint(code) {
   }
   return prints;
 }
-
 // ─────────────────────────────────────────────
 //  QUIZ
+//  Questions are stored in _quizStore keyed by
+//  "lessonKey_stepIndex" so answerQuiz() can look
+//  them up at click-time. This avoids embedding
+//  explanation strings directly into onclick=""
+//  attributes, which breaks on any apostrophe
+//  (it's, don't, you'll, etc.) — the root cause
+//  of the "Missing initializer in const" error.
 // ─────────────────────────────────────────────
+const _quizStore = {};
+
 function renderQuiz(step) {
+  // Save questions under a key that answerQuiz can look up
+  const storeKey = state.currentLesson + '_' + state.currentStep;
+  _quizStore[storeKey] = step.questions;
+
   let html = '';
   step.questions.forEach((q, qi) => {
     html += `<div class="quiz-block" id="quiz-${qi}">
@@ -2735,7 +3124,9 @@ function renderQuiz(step) {
       <div class="quiz-options">`;
     q.options.forEach((opt, oi) => {
       const key = String.fromCharCode(65 + oi);
-      html += `<div class="quiz-option" id="qopt-${qi}-${oi}" onclick="answerQuiz(${qi},${oi},${q.correct},'${(q.explanation||'').replace(/'/g,'&#39;')}')">
+      // Only pass safe integer indices — no strings with apostrophes
+      html += `<div class="quiz-option" id="qopt-${qi}-${oi}"
+          onclick="answerQuiz('${state.currentLesson}',${state.currentStep},${qi},${oi})">
         <div class="quiz-option-key">${key}</div>
         <span>${opt}</span>
       </div>`;
@@ -2747,16 +3138,27 @@ function renderQuiz(step) {
   return html;
 }
 
-function answerQuiz(qi, selected, correct, explanation) {
-  // Disable all options for this question
-  document.querySelectorAll(`#quiz-${qi} .quiz-option`).forEach((el, i) => {
+function answerQuiz(lessonKey, stepIdx, qi, selected) {
+  // Look up the question data from the store instead of receiving text as HTML attribute
+  const storeKey = lessonKey + '_' + stepIdx;
+  const questions = _quizStore[storeKey];
+  if (!questions || !questions[qi]) return;
+
+  const q = questions[qi];
+  const correct = q.correct;
+  const explanation = q.explanation || '';
+
+  // Disable all options and apply correct/wrong styles
+  q.options.forEach(function(_, oi) {
+    const el = document.getElementById('qopt-' + qi + '-' + oi);
+    if (!el) return;
     el.style.pointerEvents = 'none';
-    if (i === correct) el.classList.add('correct');
-    else if (i === selected && i !== correct) el.classList.add('wrong');
+    if (oi === correct) el.classList.add('correct');
+    else if (oi === selected && oi !== correct) el.classList.add('wrong');
   });
 
   const fb = document.getElementById('qfb-' + qi);
-  fb.classList.add('show');
+  if (!fb) return;
   if (selected === correct) {
     fb.className = 'quiz-feedback show correct';
     fb.textContent = '✓ ' + explanation;
